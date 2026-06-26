@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://api.yourdomain.com; frame-ancestors 'none'; form-action 'self'">
+  <title>Legal Center | Conversable</title>
+  <meta name="description" content="Read our Privacy Policy, Terms of Service, Cookie Policy, Security Policy, and other legal commitments. Clear, readable terms for Conversable users.">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Structured Data for SEO Compliance -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Conversable Legal Center",
+    "description": "Terms of Service, Privacy Policy, AI Usage rules, and other legal disclosures for Conversable AB.",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Conversable Inc.",
+      "url": "https://conversable.app"
+    }
+  }
+  </script>
+</head>
+<body>
+  <!-- Reading Progress Indicator -->
+  <div class="reading-progress-container">
+    <div id="reading-progress" class="reading-progress-bar" aria-hidden="true"></div>
+  </div>
+
+  <!-- Organic contour background -->
+  <div class="contour-bg">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" preserveAspectRatio="none">
+      <path d="M 0,100 C 150,150 350,50 500,100 C 650,150 850,50 1000,100" fill="none" stroke="rgba(85,85,85,0.06)" stroke-width="1.5"/>
+      <path d="M 0,200 C 300,150 250,350 600,250 C 750,200 850,300 1000,200" fill="none" stroke="rgba(85,85,85,0.06)" stroke-width="1.5"/>
+      <path d="M 0,400 C 250,450 350,300 650,500 C 850,630 900,450 1000,550" fill="none" stroke="rgba(85,85,85,0.06)" stroke-width="1.5"/>
+    </svg>
+  </div>
+
+  <!-- Header / Navigation -->
+  <header class="header">
+    <div class="container navbar">
+      <a href="index.html" class="logo" id="nav-logo">
+        conversable<span>.</span>
+      </a>
+      <nav class="nav-links" aria-label="Main Navigation">
+        <a href="index.html#why-it-works" class="nav-item">Why It Works</a>
+        <a href="index.html#playground" class="nav-item">Live Simulator</a>
+        <a href="index.html#features" class="nav-item">Features</a>
+        <a href="index.html#pricing" class="nav-item">Pricing</a>
+      </nav>
+      <div class="nav-cta">
+        <a href="index.html#signup-section" class="btn btn-primary" id="header-cta-btn">Get Started</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="legal-main">
+    <div class="container">
+      <!-- Section Header -->
+      <div class="section-header text-center" style="margin-bottom: var(--space-xl);">
+        <div class="tag-label">Compliance & Legal</div>
+        <h1 class="section-title" style="font-size: 3rem; margin-top: 10px;">Terms & Policies<span>.</span></h1>
+        <p class="section-desc">Straightforward, plain-language agreements covering our services, guidelines, and data commitments.</p>
+      </div>
+
+      <!-- Main Legal Core Layout -->
+      <div class="legal-layout">
+        <!-- Mobile Navigation Trigger -->
+        <div class="mobile-legal-nav-trigger">
+          <button id="mobile-nav-toggle" class="btn btn-secondary" aria-expanded="false" aria-controls="legal-sidebar-nav">
+            <span>Select Policy</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px; height:16px;"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+        </div>
+
+        <!-- Sidebar Navigation (Col 1) -->
+        <aside class="legal-sidebar" id="legal-sidebar-nav" aria-label="Policy list">
+          <div class="sidebar-header">
+            <h3>Policies</h3>
+          </div>
+          <nav class="sidebar-menu">
+            <a href="#privacy" class="sidebar-link active" data-policy="privacy">Privacy Policy</a>
+            <a href="#terms" class="sidebar-link" data-policy="terms">Terms of Service</a>
+            <a href="#cookies" class="sidebar-link" data-policy="cookies">Cookie Policy</a>
+            <a href="#refund" class="sidebar-link" data-policy="refund">Refund Policy</a>
+            <a href="#community" class="sidebar-link" data-policy="community">Community Guidelines</a>
+            <a href="#ai" class="sidebar-link" data-policy="ai">AI Usage Policy</a>
+            <a href="#deletion" class="sidebar-link" data-policy="deletion">Data Deletion Policy</a>
+            <a href="#security" class="sidebar-link" data-policy="security">Security Policy</a>
+            <a href="#accessibility" class="sidebar-link" data-policy="accessibility">Accessibility Statement</a>
+            <a href="#contact" class="sidebar-link" data-policy="contact">Contact & Legal</a>
+          </nav>
+        </aside>
+
+        <!-- Main Content Area (Col 2) -->
+        <section class="legal-content-pane" aria-live="polite">
+          <!-- Toolbar -->
+          <div class="legal-toolbar">
+            <div class="search-box-container">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="search-icon"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+              <input type="text" id="legal-search-input" placeholder="Search within active policy..." aria-label="Search within active policy">
+              <button id="clear-search-btn" style="display:none;" aria-label="Clear search">&times;</button>
+            </div>
+            <div class="toolbar-actions">
+              <button class="btn-toolbar" id="btn-print-doc" title="Print document">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6"></path><rect x="6" y="14" width="12" height="8" rx="1"></rect></svg>
+                <span>Print</span>
+              </button>
+              <button class="btn-toolbar" id="btn-download-pdf" title="Save as PDF">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg>
+                <span>PDF</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Active Article Box -->
+          <div class="legal-article-box">
+            <div class="article-meta">
+              <span class="last-updated">Last Updated: June 26, 2026</span>
+              <span class="reading-time" id="estimated-reading-time">5 min read</span>
+            </div>
+
+            <!-- Privacy Policy -->
+            <article id="privacy" class="policy-article active">
+              <h1>Privacy Policy</h1>
+              <p class="lead">At Conversable, we build deliberate, minimalist social learning tools. We are committed to protecting your personal data, simulated inputs, and privacy rights. This policy outlines what we collect, how it is secured, and your control over your data.</p>
+              
+              <h2 id="information-we-collect">Information We Collect</h2>
+              <p>We believe in absolute data minimization. We only collect the minimal personal data necessary to provide a high-fidelity simulator experience and help you track your progress.</p>
+              
+              <h2 id="account-information">Account Information</h2>
+              <p>When you create an account, we collect your email address, name, and password (securely salted and hashed). This data is used solely to authenticate your identity, secure your dashboard, and prevent service abuse.</p>
+              
+              <h2 id="conversation-data">Conversation Data</h2>
+              <p>As you run simulated negotiations or conversations in the playground, the choices you select are processed to build your behavioral feedback. This data is only linked to your account to map historical improvements.</p>
+              
+              <h2 id="ai-analysis-data">AI Analysis Data</h2>
+              <p>We analyze your simulation choices using secure, isolated large language models to construct communication reports. This analysis checks clarity, confidence, and empathy levels. We do not use your simulated conversation data to train public foundation models.</p>
+              
+              <h2 id="uploaded-files">Uploaded Files</h2>
+              <p>If you upload custom conversation scripts or scenario files, these files are encrypted at rest and accessible only by you and the specific services required to parse them for your simulator sessions.</p>
+              
+              <h2 id="device-information">Device Information</h2>
+              <p>To optimize display layouts and debug system faults, we log device type, operating system version, browser user agent, language settings, and IP address. This data is cleaned of personal identifiers and deleted within 30 days.</p>
+              
+              <h2 id="cookies">Cookies</h2>
+              <p>We use essential cookies to maintain your login session. We do not use third-party tracking, retargeting, or advertising cookies. You can manage cookies in your browser settings at any time.</p>
+              
+              <h2 id="analytics">Analytics</h2>
+              <p>We collect anonymized product telemetry to understand how our features are used. This data contains no IP addresses or personal identifiers, keeping your activity fully private.</p>
+              
+              <h2 id="payment-information">Payment Information</h2>
+              <p>Payment information is processed securely by Stripe, our third-party billing provider. Conversable does not store, transmit, or have access to your credit card number or verification details.</p>
+              
+              <h2 id="third-party-services">Third-Party Services</h2>
+              <p>We partner with secure cloud infrastructure and AI inference providers. Every provider is carefully vetted and bound by strict data processing agreements ensuring compliance with confidentiality laws.</p>
+              
+              <h2 id="how-we-use-information">How We Use Information</h2>
+              <p>Your data is used to provide the simulator, generate communication analytics, process subscription renewals, resolve technical support tickets, and implement security controls to prevent bot attacks or spam.</p>
+              
+              <h2 id="data-retention">Data Retention</h2>
+              <p>We keep your personal information only as long as you maintain an active account. When you delete your account, your data is deleted within the timelines outlined in our Data Deletion Policy.</p>
+              
+              <h2 id="security">Security</h2>
+              <p>We apply high-grade physical and digital security, including AES-256 encryption at rest, TLS 1.3 transit encryption, and continuous vulnerability scanning. Details are described in our Security Policy.</p>
+              
+              <h2 id="international-transfers">International Transfers</h2>
+              <p>Your information may be transferred to and processed in countries outside your residence (primarily the EU and the United States), where cloud facilities are subject to rigorous privacy safeguards.</p>
+              
+              <h2 id="childrens-privacy">Children's Privacy</h2>
+              <p>Our platform is directed to users who are at least 13 years of age. We do not knowingly collect personal data from anyone under the age of 13. If you believe a child under 13 has provided us with data, contact us.</p>
+              
+              <h2 id="user-rights">User Rights</h2>
+              <p>Depending on your location, you have rights to access, update, correct, restrict, download, or delete your personal data. We honor these rights globally, regardless of your local jurisdiction.</p>
+              
+              <h2 id="account-deletion">Account Deletion</h2>
+              <p>You can delete your account at any time through your dashboard profile settings, which immediately triggers the permanent deletion of your profile and history.</p>
+              
+              <h2 id="contact-information">Contact Information</h2>
+              <p>For questions or requests regarding your personal data, email our privacy team at <code>privacy@conversable.app</code>.</p>
+            </article>
+
+            <!-- Terms of Service -->
+            <article id="terms" class="policy-article">
+              <h1>Terms of Service</h1>
+              <p class="lead">Thank you for using Conversable. These Terms of Service govern your access to and use of our website, simulators, and related services. Please read them carefully.</p>
+              
+              <h2 id="acceptance">Acceptance</h2>
+              <p>By registering for an account or using the Conversable website, you agree to be bound by these Terms of Service and all policies incorporated by reference. If you do not agree, you must not use our services.</p>
+              
+              <h2 id="eligibility">Eligibility</h2>
+              <p>You must be at least 13 years old to use Conversable. If you are under 18, you represent that you have your parent or legal guardian's permission to use the platform.</p>
+              
+              <h2 id="user-accounts">User Accounts</h2>
+              <p>When you create an account, you must provide accurate, current information. You are responsible for safeguarding your login credentials and are liable for any activity occurring under your account.</p>
+              
+              <h2 id="acceptable-use">Acceptable Use</h2>
+              <p>Conversable is designed for deliberate communication practice. You agree to use the service in compliance with all applicable laws and respect the community environment.</p>
+              
+              <h2 id="prohibited-activities">Prohibited Activities</h2>
+              <p>You may not scrape our content, bypass safety rate limits, reverse engineer our simulator engine, distribute malware, or run automated scripts that interfere with platform availability.</p>
+              
+              <h2 id="ai-limitations">AI Limitations</h2>
+              <p>Our simulator leverages generative AI. You understand that AI characters and coaching feedback are simulated. Feedback is educational and should not replace human professional judgement.</p>
+              
+              <h2 id="subscription-terms">Subscription Terms</h2>
+              <p>We offer monthly and annual billing subscriptions. Subscriptions automatically renew at the end of each billing cycle unless cancelled through your account dashboard before the renewal date.</p>
+              
+              <h2 id="payments">Payments</h2>
+              <p>All billing is processed securely. By subscribing, you authorize our payment gateway (Stripe) to charge your payment method for the recurring subscription fees, taxes, and transaction charges.</p>
+              
+              <h2 id="refund-policy">Refund Policy</h2>
+              <p>Purchases are subject to our Refund Policy. Annual subscriptions are eligible for a 14-day refund window. Monthly plans are non-refundable but can be cancelled at any time.</p>
+              
+              <h2 id="intellectual-property">Intellectual Property</h2>
+              <p>All code, text design, scenarios, layout designs, and logos on the website are the intellectual property of Conversable Inc. and protected by copyright and trademark laws.</p>
+              
+              <h2 id="user-generated-content">User Generated Content</h2>
+              <p>You retain ownership of custom scenarios you author. By creating them on our system, you grant Conversable a limited, non-exclusive license to host and parse this content solely for your account.</p>
+              
+              <h2 id="termination">Termination</h2>
+              <p>We reserve the right to suspend or terminate your account immediately, without notice, if we determine you have violated these Terms of Service or engaged in activities harmful to our users.</p>
+              
+              <h2 id="warranty-disclaimer">Warranty Disclaimer</h2>
+              <p>The service is provided on an "as is" and "as available" basis. Conversable disclaims all warranties, express or implied, including fitness for a particular purpose or non-infringement.</p>
+              
+              <h2 id="limitation-of-liability">Limitation of Liability</h2>
+              <p>To the maximum extent permitted by law, Conversable Inc. will not be liable for any indirect, incidental, or consequential damages. Our total liability is limited to the fees you paid us in the last 12 months.</p>
+              
+              <h2 id="governing-law">Governing Law</h2>
+              <p>These terms are governed by the laws of Sweden and the Tokyo District Court, without regard to conflicts of law provisions. Any dispute shall be resolved in these courts.</p>
+              
+              <h2 id="contact">Contact</h2>
+              <p>If you have questions about these Terms of Service, please contact our legal department at <code>legal@conversable.app</code>.</p>
+            </article>
+
+            <!-- Cookie Policy -->
+            <article id="cookies" class="policy-article">
+              <h1>Cookie Policy</h1>
+              <p class="lead">This Cookie Policy explains how Conversable uses cookies and similar technologies to recognize you when you visit our website. It details what these cookies are and how you can control them.</p>
+              
+              <h2 id="what-cookies-are">What Cookies Are</h2>
+              <p>Cookies are small data files placed on your computer or mobile device when you visit a website. They are widely used by website owners to make their websites work, or work more efficiently, as well as to provide reporting information.</p>
+              
+              <h2 id="essential-cookies">Essential Cookies</h2>
+              <p>These cookies are strictly necessary to provide you with services available through our platform and to use some of its features, such as access to secure authenticated areas.</p>
+              
+              <h2 id="analytics-cookies">Analytics Cookies</h2>
+              <p>These cookies collect information that is used in aggregate form to help us understand how our website is being used or how effective our platform performance is, helping us improve the user experience.</p>
+              
+              <h2 id="preference-cookies">Preference Cookies</h2>
+              <p>We use preference cookies to remember your settings (such as dark mode choice, simulator volume, or your selected coaching language), so you do not have to configure them on every visit.</p>
+              
+              <h2 id="third-party-cookies">Third-Party Cookies</h2>
+              <p>In addition to our own cookies, secure third parties (specifically our payment processor Stripe) may set cookies to handle fraud prevention, verify transactions, and ensure secure payments.</p>
+              
+              <h2 id="managing-cookies">Managing Cookies</h2>
+              <p>You have the right to decide whether to accept or reject cookies. You can set or amend your web browser controls to accept or refuse cookies. If you choose to reject cookies, you may still use our website, though your access to some functionality and secure areas may be restricted.</p>
+              
+              <h2 id="browser-settings">Browser Settings</h2>
+              <p>Most browsers allow you to block, delete, or manage cookies through their settings menu. Please refer to your browser's help documentation (Chrome, Firefox, Safari, Edge) for specific instructions.</p>
+            </article>
+
+            <!-- Refund Policy -->
+            <article id="refund" class="policy-article">
+              <h1>Refund Policy</h1>
+              <p class="lead">We want you to be completely satisfied with Conversable. This policy outlines the guidelines regarding subscriptions, cancellations, and refund eligibility for our services.</p>
+              
+              <h2 id="free-trial">Free Trial</h2>
+              <p>We offer a free tier with access to introductory scenarios so you can evaluate the Conversable simulator before making a financial commitment. We encourage all users to explore the simulator prior to subscribing.</p>
+              
+              <h2 id="monthly-plans">Monthly Plans</h2>
+              <p>Monthly subscriptions provide access to all premium scenarios. You can cancel your monthly plan at any time. We do not issue prorated refunds for partial monthly billing cycles; your service will remain active until the end of your paid period.</p>
+              
+              <h2 id="annual-plans">Annual Plans</h2>
+              <p>Annual subscriptions offer a discounted rate. If you purchase or renew an annual subscription, you are eligible to request a full refund within 14 calendar days of the charge by contacting our billing team.</p>
+              
+              <h2 id="cancellation">Cancellation</h2>
+              <p>You can cancel your subscription at any time directly through your billing portal page. Cancellation stops future recurring charges. No cancellation fees apply.</p>
+              
+              <h2 id="refund-eligibility">Refund Eligibility</h2>
+              <p>To request a refund, please contact us with your account details. Refunds are issued to the original payment method. Accounts terminated due to breaches of our Terms of Service are ineligible for refunds.</p>
+              
+              <h2 id="billing-errors">Billing Errors</h2>
+              <p>If you believe you have been billed in error, please report it to us within 45 days. We will investigate and immediately reverse any duplicate or erroneous charges identified.</p>
+              
+              <h2 id="exceptions">Exceptions</h2>
+              <p>We understand that unique situations can occur. We review exceptional billing cases (e.g. system access failures or prolonged dormancy) individually and reserve the right to issue refunds at our sole discretion.</p>
+              
+              <h2 id="contact-refund">Contact</h2>
+              <p>To initiate a refund request or ask a question about your billing history, email our financial support team at <code>billing@conversable.app</code>.</p>
+            </article>
+
+            <!-- Community Guidelines -->
+            <article id="community" class="policy-article">
+              <h1>Community Guidelines</h1>
+              <p class="lead">Conversable is a space for deliberate learning, confidence building, and professional development. To ensure a safe, constructive environment, all members must adhere to these Guidelines.</p>
+              
+              <h2 id="respect-others">Respect Others</h2>
+              <p>We expect all users to interact in a respectful, civil manner. This includes how you write feedback, share custom scripts, or interact with other learners in forums.</p>
+              
+              <h2 id="no-harassment">No Harassment</h2>
+              <p>We have zero tolerance for harassment, bullying, threats, stalking, or persistent unwanted attention. Any behavior intended to intimidate, demean, or upset another member will result in immediate suspension.</p>
+              
+              <h2 id="no-hate-speech">No Hate Speech</h2>
+              <p>Any content that attacks, denigrates, or promotes hatred against individuals or groups based on race, ethnicity, religion, gender, sexual orientation, disability, or nationality is strictly prohibited.</p>
+              
+              <h2 id="no-illegal-activities">No Illegal Activities</h2>
+              <p>You may not use our platform to coordinate, promote, or participate in illegal actions, nor create custom simulator scenarios that detail or encourage violations of local laws.</p>
+              
+              <h2 id="no-spam">No Spam</h2>
+              <p>Do not use Conversable to distribute promotional materials, referral schemes, affiliate links, malware, or unsolicited advertisements.</p>
+              
+              <h2 id="no-abuse-of-ai">No Abuse of AI</h2>
+              <p>You may not attempt to manipulate our AI simulator characters to output sexually explicit, violent, illegal, or abusive language. Attempting to bypass safety filters (jailbreaking) is a violation of these guidelines.</p>
+              
+              <h2 id="reporting">Reporting</h2>
+              <p>If you encounter content or behavior that violates these guidelines, please report it to our team by clicking the report flags in the app or emailing <code>report@conversable.app</code>.</p>
+              
+              <h2 id="enforcement">Enforcement</h2>
+              <p>Our moderation team reviews reports daily. We take a measured approach but reserve the right to issue warnings, mute communications, or lock profiles depending on the nature of the violation.</p>
+              
+              <h2 id="account-suspension">Account Suspension</h2>
+              <p>Serious or repeated violations of these guidelines will result in permanent account termination without warning or refund of subscription balances.</p>
+            </article>
+
+            <!-- AI Usage Policy -->
+            <article id="ai" class="policy-article">
+              <h1>AI Usage Policy</h1>
+              <p class="lead">This AI Usage Policy defines the scope, limitations, and responsibilities governing the use of artificial intelligence models within the Conversable simulator and reporting features.</p>
+              
+              <h2 id="ai-generated-responses">AI-Generated Responses</h2>
+              <p>All conversation partners and feedback reports are generated using large language models. The dialog options, responses, and score evaluations are calculated in real-time by algorithmic structures.</p>
+              
+              <h2 id="ai-limitations-policy">AI Limitations</h2>
+              <p>Generative AI models are predictive systems trained on public data. They do not possess consciousness, human empathy, or objective understanding. They can occasionally exhibit biases or hallucinate incorrect details.</p>
+              
+              <h2 id="no-guaranteed-accuracy">No Guaranteed Accuracy</h2>
+              <p>We do not guarantee the objective correctness or validity of the simulator's responses or scoring feedback. Communication reports are directional recommendations rather than formal psychological metrics.</p>
+              
+              <h2 id="human-responsibility">Human Responsibility</h2>
+              <p>You retain full agency and responsibility for your real-world interactions. Do not make high-stakes business, professional, or personal decisions based solely on the scores or simulation outcomes generated by Conversable.</p>
+              
+              <h2 id="educational-purpose">Educational Purpose</h2>
+              <p>The platform is designed exclusively for self-directed practice, educational simulations, and soft-skills modeling. It is a sandbox to test styles, not a definitive predictor of social success.</p>
+              
+              <h2 id="communication-coaching-disclaimer">Communication Coaching Disclaimer</h2>
+              <p>Conversable feedback is intended for coaching purposes. It does not replace professional therapy, executive counseling, or specialized interpersonal relationship advice.</p>
+              
+              <h2 id="no-legal-advice">No Legal Advice</h2>
+              <p>Although you can practice legal-themed negotiations or compliance conversations, Conversable's simulator and AI feedback do not constitute legal advice or formal representation.</p>
+              
+              <h2 id="no-medical-advice">No Medical Advice</h2>
+              <p>The AI coaching metrics and interactions are not therapy, clinical psychology, medical advice, or psychiatric treatment. If you are experiencing social anxiety that impacts your health, consult a licensed healthcare professional.</p>
+              
+              <h2 id="no-financial-advice">No Financial Advice</h2>
+              <p>Salary negotiation simulations are styled for practice. AI feedback regarding compensations, valuations, or contracts is not financial, investment, or career advisement.</p>
+            </article>
+
+            <!-- Data Deletion Policy -->
+            <article id="deletion" class="policy-article">
+              <h1>Data Deletion Policy</h1>
+              <p class="lead">At Conversable, we believe your data belongs to you. This policy outlines how you can delete your data, what is removed, what is retained, and the recovery timeline.</p>
+              
+              <h2 id="how-users-delete-account">How Users Delete Their Account</h2>
+              <p>You can delete your account instantly by navigating to your Account Settings page and clicking "Delete Account". Alternatively, you can request account deletion by emailing our support desk at <code>support@conversable.app</code>.</p>
+              
+              <h2 id="what-data-is-removed">What Data Is Removed</h2>
+              <p>Upon deletion, all personally identifiable information (PII) is removed. This includes your name, email, avatar, hashed password, completed conversation logs, performance metrics, and coaching history.</p>
+              
+              <h2 id="what-data-is-retained">What Data Is Retained</h2>
+              <p>We retain transaction histories and invoices for tax compliance as required by global financial regulations. Additionally, we retain anonymized, aggregated simulator usage statistics to maintain infrastructure logs. This statistical data cannot be linked back to you.</p>
+              
+              <h2 id="deletion-timeline">Deletion Timeline</h2>
+              <p>The account deletion process begins immediately. All active databases purge your user profile within 7 business days. Backup storage files are systematically overwritten and cleared within 30 days.</p>
+              
+              <h2 id="recovery-period">Recovery Period</h2>
+              <p>We maintain a 72-hour grace period during which you can cancel your deletion request by contacting support. After 72 hours, the database purge begins and the deletion is irreversible.</p>
+            </article>
+
+            <!-- Security Policy -->
+            <article id="security" class="policy-article">
+              <h1>Security Policy</h1>
+              <p class="lead">We prioritize the security of your account and personal simulator data. This policy details our encryption, infrastructure, and responsible vulnerability disclosure process.</p>
+              
+              <h2 id="encryption">Encryption</h2>
+              <p>All data exchanged between your browser and Conversable is encrypted using TLS 1.3. Your database logs, custom scripts, and personal records are encrypted at rest using AES-256 standards.</p>
+              
+              <h2 id="authentication">Authentication</h2>
+              <p>We support secure, passwordless authentication links (magic links) and OAuth 2.0 (Google, GitHub) to protect your account against credential stuffing and brute-force attacks.</p>
+              
+              <h2 id="secure-payments">Secure Payments</h2>
+              <p>We do not collect or store credit card details. All billing actions are handled by Stripe, which operates under PCI-DSS Level 1 compliance to secure your transaction credentials.</p>
+              
+              <h2 id="infrastructure">Infrastructure</h2>
+              <p>Conversable runs on premium cloud infrastructure providers that hold ISO 27001, SOC 2 Type II, and FedRAMP security certifications, ensuring round-the-clock physical protection of servers.</p>
+              
+              <h2 id="monitoring">Monitoring</h2>
+              <p>We implement automated intrusion detection systems and log auditing tools that monitor API endpoints for anomalous activity. Suspicious behaviors trigger immediate ops team alerts.</p>
+              
+              <h2 id="responsible-disclosure">Responsible Disclosure</h2>
+              <p>We value the assistance of security researchers in keeping Conversable safe. We encourage researchers to test our public systems for vulnerabilities and report them to us privately.</p>
+              
+              <h2 id="vulnerability-reporting">Vulnerability Reporting</h2>
+              <p>If you identify a security issue, please email <code>security@conversable.app</code> with detailed reproduction steps. We resolve to fix critical vulnerabilities within 48 hours and will not prosecute researchers who act in good faith.</p>
+            </article>
+
+            <!-- Accessibility Statement -->
+            <article id="accessibility" class="policy-article">
+              <h1>Accessibility Statement</h1>
+              <p class="lead">Conversable is dedicated to building inclusive tools. We aim to ensure that our website, simulator, and legal resources are accessible to everyone, including individuals with disabilities.</p>
+              
+              <h2 id="accessibility-commitment">Commitment to Accessibility</h2>
+              <p>We strive to make Conversable conform to the Web Content Accessibility Guidelines (WCAG) 2.1 Level AA. We design our visual systems to ensure readability, clarity, and ease of use.</p>
+              
+              <h2 id="keyboard-navigation">Keyboard Navigation</h2>
+              <p>Our website, options menu, and simulator components are fully navigable using a keyboard. Users can navigate sections using <code>Tab</code> and activate controls with <code>Enter</code> or <code>Space</code>.</p>
+              
+              <h2 id="screen-readers">Screen Readers</h2>
+              <p>We write semantic HTML structures with appropriate ARIA tags (including <code>aria-live</code> for dynamic simulator status changes) to support text-to-speech software (VoiceOver, NVDA, JAWS).</p>
+              
+              <h2 id="contrast">Contrast</h2>
+              <p>We utilize high-contrast, minimalist palettes (pure white surfaces, dark gray borders, pure black text) to ensure a minimum contrast ratio of 4.5:1, fulfilling and exceeding WCAG standards.</p>
+              
+              <h2 id="responsive-design">Responsive Design</h2>
+              <p>Our layouts scale fluidly. Users can zoom their browser window up to 300% without layout overlapping or losing control buttons.</p>
+              
+              <h2 id="continuous-improvements">Continuous Improvements</h2>
+              <p>We test our site regularly using automated accessibility scanners and manual user flows. If you experience barriers, please contact us at <code>accessibility@conversable.app</code> so we can resolve them.</p>
+            </article>
+
+            <!-- Contact & Legal Information -->
+            <article id="contact" class="policy-article">
+              <h1>Contact & Legal Information</h1>
+              <p class="lead">For official business inquiries, compliance requests, or legal notices, please review our registered corporate details and contact methods below.</p>
+              
+              <h2 id="company-name">Company Name</h2>
+              <p>Conversable AB (Stockholm, Sweden)<br>Conversable Inc. (Delaware, USA)</p>
+              
+              <h2 id="support-email">Support Email</h2>
+              <p>For account assistance, simulator questions, or bug reports:<br><code>support@conversable.app</code></p>
+              
+              <h2 id="business-email">Business Email</h2>
+              <p>For partnerships, media requests, or business inquiries:<br><code>contact@conversable.app</code></p>
+              
+              <h2 id="legal-email">Legal Email</h2>
+              <p>For legal notices, compliance queries, or data requests:<br><code>legal@conversable.app</code></p>
+              
+              <h2 id="registered-address">Registered Address</h2>
+              <p>Conversable AB<br>Norrlandsgatan 15<br>111 43 Stockholm<br>Sweden</p>
+              
+              <h2 id="contact-form">Contact Form</h2>
+              <div class="legal-contact-form-box">
+                <form id="legal-contact-form" onsubmit="event.preventDefault(); alert('Thank you. Your inquiry has been submitted. Reference ID: ' + Math.floor(Math.random() * 1000000)); this.reset();">
+                  <div class="form-group-row">
+                    <div class="form-control-group">
+                      <label for="c-name">Name</label>
+                      <input type="text" id="c-name" placeholder="E.g. Kenji Tanaka" required>
+                    </div>
+                    <div class="form-control-group">
+                      <label for="c-email">Email Address</label>
+                      <input type="email" id="c-email" placeholder="E.g. kenji@example.com" required>
+                    </div>
+                  </div>
+                  <div class="form-control-group">
+                    <label for="c-subject">Subject</label>
+                    <select id="c-subject" required>
+                      <option value="" disabled selected>Select an option</option>
+                      <option value="privacy">Privacy / GDPR Data Request</option>
+                      <option value="legal">Terms / Compliance Query</option>
+                      <option value="billing">Billing / Refund Claim</option>
+                      <option value="security">Security Vulnerability Report</option>
+                      <option value="other">General Business Inquiry</option>
+                    </select>
+                  </div>
+                  <div class="form-control-group">
+                    <label for="c-message">Message</label>
+                    <textarea id="c-message" rows="5" placeholder="Please describe your legal or support request in detail..." required></textarea>
+                  </div>
+                  <button type="submit" class="btn btn-primary">Submit Inquiry</button>
+                </form>
+              </div>
+              
+              <h2 id="response-time">Response Time</h2>
+              <p>Our compliance officers and legal desk review all incoming messages. We commit to acknowledging receipt of legal notifications within 24 business hours, and providing a substantive resolution within 48 to 72 hours.</p>
+            </article>
+          </div>
+        </section>
+
+        <!-- Sidebar Active Page TOC (Col 3) -->
+        <aside class="legal-toc-aside" id="legal-toc-nav" aria-label="Table of contents">
+          <div class="toc-header">
+            <h4>On This Page</h4>
+          </div>
+          <div class="toc-content" id="active-toc-list">
+            <!-- Dynamically generated navigation links -->
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <!-- Back to Top Button -->
+  <button id="back-to-top" title="Go to top" aria-label="Go to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up"><line x1="12" x2="12" y1="19" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+  </button>
+
+  <!-- Footer -->
+  <footer class="footer-section">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <a href="index.html" class="logo">conversable<span>.</span></a>
+        <p class="footer-tagline">Minimalist deliberate social learning. Inspired by Nordic and Japanese design philosophies.</p>
+      </div>
+      <div class="footer-links-col">
+        <h4>Product</h4>
+        <a href="index.html#why-it-works">Why It Works</a>
+        <a href="index.html#playground">Interactive Simulator</a>
+        <a href="index.html#features">Features</a>
+        <a href="index.html#pricing">Pricing</a>
+      </div>
+      <div class="footer-links-col">
+        <h4>Legal</h4>
+        <a href="#privacy">Privacy Policy</a>
+        <a href="#terms">Terms of Service</a>
+        <a href="#cookies">Cookie Policy</a>
+        <a href="#refund">Refund Policy</a>
+        <a href="#community">Community Guidelines</a>
+        <a href="#ai">AI Usage Policy</a>
+        <a href="#deletion">Data Deletion</a>
+        <a href="#security">Security Policy</a>
+        <a href="#accessibility">Accessibility Statement</a>
+        <a href="#contact">Contact & Legal</a>
+      </div>
+      <div class="footer-links-col">
+        <h4>Connect</h4>
+        <a href="#">Twitter</a>
+        <a href="#">LinkedIn</a>
+        <a href="#">Contact Us</a>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <p>&copy; 2026 Conversable Inc. All rights reserved. Designed in Sweden & Tokyo.</p>
+    </div>
+  </footer>
+
+  <!-- Lucide Icon Library -->
+  <script src="lucide.min.js"></script>
+  <script src="legal.js"></script>
+</body>
+</html>

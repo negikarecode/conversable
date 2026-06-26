@@ -1,0 +1,6 @@
+{
+  "name": "Convertible",
+  "description": "An interactive social skills training app to practice real-world conversation scenarios and get professional coaching feedback.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

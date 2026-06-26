@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://api.yourdomain.com; frame-ancestors 'none'; form-action 'self'">
+  <title>Conversable — Master Your Social Reflexes</title>
+  <meta name="description" content="An interactive, distraction-free playground to practice real-world conversation scenarios and get professional coaching feedback powered by AI.">
+  <!-- Plus Jakarta Sans Font for premium geometric aesthetic -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Background Decorative Contour Lines (Japandi Organic Accent) -->
+  <div class="contour-bg" aria-hidden="true">
+    <svg viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg">
+      <path d="M 0,200 C 300,150 400,350 700,250 C 900,180 950,400 1000,350" fill="none" stroke="rgba(85,85,85,0.06)" stroke-width="1.5"/>
+      <path d="M 0,400 C 250,450 350,300 650,500 C 850,630 900,450 1000,550" fill="none" stroke="rgba(85,85,85,0.06)" stroke-width="1.5"/>
+      <path d="M 0,600 C 200,550 450,750 750,600 C 880,530 920,800 1000,750" fill="none" stroke="rgba(85,85,85,0.06)" stroke-width="1.5"/>
+      <path d="M 0,800 C 350,750 300,950 800,850 C 900,800 950,920 1000,900" fill="none" stroke="rgba(85,85,85,0.06)" stroke-width="1.5"/>
+    </svg>
+  </div>
+
+  <!-- Header / Navigation -->
+  <header class="header">
+    <div class="container navbar">
+      <a href="#" class="logo" id="nav-logo">
+        conversable<span>.</span>
+      </a>
+      <nav class="nav-links" aria-label="Main Navigation">
+        <a href="#why-it-works" class="nav-item">Why It Works</a>
+        <a href="#playground" class="nav-item">Live Simulator</a>
+        <a href="#features" class="nav-item">Features</a>
+        <a href="#pricing" class="nav-item">Pricing</a>
+      </nav>
+      <div class="nav-cta" style="display: flex; gap: 8px;">
+        <a href="#signup-section" class="btn btn-primary" id="header-cta-btn">Get Started</a>
+        <a href="/conversable.apk" download class="btn btn-secondary" style="padding: 10px 16px; font-size: 14px;" id="header-download-btn">Download APK</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="container hero-grid">
+        <!-- Hero Content (Left) -->
+        <div class="hero-content">
+          <div class="tag-label">AI Social Simulation</div>
+          <h1 class="hero-title">Train your social reflexes<span>.</span></h1>
+          <p class="hero-subtitle">
+            An interactive, distraction-free playground to master high-stakes conversations. Practice salary negotiations, public speaking, or difficult workplace conversations and get instant coaching feedback.
+          </p>
+          
+          <!-- Hero Signup Form -->
+          <form class="signup-form" id="hero-signup-form" onsubmit="event.preventDefault(); handleSignup(this);">
+            <div class="form-group">
+              <input type="email" placeholder="Enter your work email" required class="form-input" id="hero-email-input" aria-label="Email Address">
+              <button type="submit" class="btn btn-primary btn-submit" id="hero-submit-btn">
+                <span>Start Training Free</span>
+                <i class="btn-arrow-icon" data-lucide="arrow-right"></i>
+              </button>
+            </div>
+            <div class="form-meta" style="flex-wrap: wrap; gap: 8px 16px;">
+              <span>✓ Free 14-day trial</span>
+              <span>✓ No credit card required</span>
+              <span>• <a href="/conversable.apk" download style="color: var(--color-text-primary); font-weight: 600; text-decoration: underline;">Download Android APK</a></span>
+            </div>
+          </form>
+        </div>
+
+        <!-- Hero Visual / Floating Preview Card (Right) -->
+        <div class="hero-visual">
+          <div class="preview-card-container">
+            <!-- Simulated Conversation Card -->
+            <div class="preview-card interactive-bubble-card">
+              <div class="card-header">
+                <div class="partner-profile">
+                  <div class="avatar avatar-investor"></div>
+                  <div>
+                    <div class="partner-name">Sarah Jenkins</div>
+                    <div class="partner-title">Lead Investor, Venture Partners</div>
+                  </div>
+                </div>
+                <div class="scenario-tag">Scenario: Raising Seed Round</div>
+              </div>
+              <div class="card-body">
+                <div class="chat-message partner">
+                  <p>"We love the product, but we're concerned about your customer acquisition costs. Why should we back you over competitor X?"</p>
+                </div>
+                <div class="chat-message user animate-fade-in" id="hero-demo-user-msg" style="display:none;">
+                  <p id="hero-demo-user-text"></p>
+                </div>
+                <div class="coaching-feedback-card animate-slide-up" id="hero-demo-feedback" style="display:none;">
+                  <div class="coaching-header">
+                    <span class="coaching-badge">AI Coach Feedback</span>
+                    <span class="score-pill">Assertiveness: 88%</span>
+                  </div>
+                  <p class="coaching-text" id="hero-demo-feedback-text"></p>
+                </div>
+              </div>
+              <div class="card-footer" id="hero-demo-actions">
+                <p class="action-prompt">Choose how you'd reply:</p>
+                <div class="action-buttons">
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="triggerHeroDemo('defensive')">
+                    "Our tech is 10x better than competitor X, so their marketing budget doesn't matter."
+                  </button>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="triggerHeroDemo('empathetic')">
+                    "Competitor X's CAC is lower due to paid ads. We rely on organic developer word-of-mouth. Let me share our growth metrics."
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Our Vision Section -->
+    <section class="vision-section">
+      <div class="container text-center">
+        <div class="tag-label">Our Vision</div>
+        <h2 class="vision-title">Built for people who want to communicate with confidence<span>.</span></h2>
+        <p class="vision-body">
+          Whether it's an interview, a first date, a sales call, a difficult conversation, or everyday communication, Conversable helps you practice before it matters.
+        </p>
+        
+        <div class="vision-grid">
+          <div class="vision-card">
+            <div class="vision-icon-container">
+              <i class="lucide-icon" data-lucide="target"></i>
+            </div>
+            <h3>Unlimited Practice</h3>
+            <p>Refine your speaking skills and test alternate responses without limits.</p>
+          </div>
+          <div class="vision-card">
+            <div class="vision-icon-container">
+              <i class="lucide-icon" data-lucide="bot"></i>
+            </div>
+            <h3>AI Powered Coaching</h3>
+            <p>Benefit from models trained on advanced social psychology frameworks.</p>
+          </div>
+          <div class="vision-card">
+            <div class="vision-icon-container">
+              <i class="lucide-icon" data-lucide="globe"></i>
+            </div>
+            <h3>Global Language Support</h3>
+            <p>Speak in your natural tongue, with seamless support for Hinglish and local slang.</p>
+          </div>
+          <div class="vision-card">
+            <div class="vision-icon-container">
+              <i class="lucide-icon" data-lucide="zap"></i>
+            </div>
+            <h3>Personalized Feedback</h3>
+            <p>Observe your behavioral metrics adapt dynamically with every statement.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Social Skills Playground (Active Demo) -->
+    <section id="playground" class="playground-section">
+      <div class="container">
+        <div class="section-header text-center">
+          <div class="tag-label">Live Simulator</div>
+          <h2 class="section-title">Try it right now<span>.</span></h2>
+          <p class="section-desc">
+            Interact with our sandbox simulator. Choose a scenario below, make your choice, and see how our AI analyzes your delivery style.
+          </p>
+        </div>
+
+        <!-- Scenario Selector Tabs -->
+        <div class="scenario-selector">
+          <button class="scenario-tab active" onclick="selectScenario('negotiation', this)">
+            Salary Negotiation
+          </button>
+          <button class="scenario-tab" onclick="selectScenario('criticism', this)">
+            Handling Client Criticism
+          </button>
+          <button class="scenario-tab" onclick="selectScenario('networking', this)">
+            Elevator Pitch
+          </button>
+        </div>
+
+        <div class="simulator-grid">
+          <!-- Left Panel: Chat Simulator -->
+          <div class="simulator-card chat-panel">
+            <div class="panel-header">
+              <div class="avatar-group">
+                <div class="avatar" id="simulator-avatar"></div>
+                <div>
+                  <h3 class="simulator-partner-name" id="sim-partner-name">Marcus Vance</h3>
+                  <p class="simulator-partner-title" id="sim-partner-title">VP of Operations</p>
+                </div>
+              </div>
+              <span class="status-indicator">Live Simulation</span>
+            </div>
+
+            <div class="panel-body" id="chat-messages-container">
+              <!-- Initial Greeting -->
+              <div class="chat-message partner">
+                <p id="sim-prompt-text">"Thanks for setting aside time, Alex. I reviewed your compensation review request. While we really value your work, a 15% raise is significantly higher than our standard yearly adjustments. How do you justify this step up?"</p>
+              </div>
+              
+              <!-- User Message (Appears dynamically) -->
+              <div class="chat-message user" id="sim-user-message" style="display: none;">
+                <p id="sim-user-text"></p>
+              </div>
+
+              <!-- Typing Indicator -->
+              <div class="typing-indicator" id="sim-typing" style="display: none;">
+                <span></span><span></span><span></span>
+              </div>
+            </div>
+
+            <div class="panel-footer" id="sim-options-container">
+              <div class="options-grid">
+                <button class="option-btn" id="opt-1" onclick="chooseOption(1)">
+                  <div class="opt-badge">
+                    <span class="opt-badge-title">OPTION</span>
+                    <span class="opt-badge-letter">A</span>
+                  </div>
+                  <span class="opt-val" id="opt-1-text">"I understand the guidelines, but I've delivered three times my target revenue this year, and my market value has risen. I believe my contributions justify the difference."</span>
+                </button>
+                <button class="option-btn" id="opt-2" onclick="chooseOption(2)">
+                  <div class="opt-badge">
+                    <span class="opt-badge-title">OPTION</span>
+                    <span class="opt-badge-letter">B</span>
+                  </div>
+                  <span class="opt-val" id="opt-2-text">"If you can't match this, I'll have to start looking elsewhere. I'm already underpaid compared to my peers in other tech companies."</span>
+                </button>
+                <button class="option-btn" id="opt-3" onclick="chooseOption(3)">
+                  <div class="opt-badge">
+                    <span class="opt-badge-title">OPTION</span>
+                    <span class="opt-badge-letter">C</span>
+                  </div>
+                  <span class="opt-val" id="opt-3-text">"I see. That's okay, I understand budgets are tight. Let's just do whatever standard adjustment is easiest for you."</span>
+                </button>
+              </div>
+            </div>
+            
+            <div class="reset-container" id="sim-reset-container" style="display: none;">
+              <button class="btn btn-secondary" onclick="resetSimulator()">
+                <i data-lucide="rotate-ccw" class="btn-icon"></i>
+                <span>Reset Scenario</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Right Panel: Premium Stats Cards -->
+          <div class="simulator-card stats-panel">
+            <div class="panel-header">
+              <h3>Live Style Analysis</h3>
+            </div>
+            
+            <div class="panel-body">
+              <div class="empty-stats-state" id="empty-stats-view">
+                <i class="empty-icon" data-lucide="activity"></i>
+                <p>Select a response option to generate communication metrics and professional coaching feedback.</p>
+              </div>
+
+              <div class="stats-content-view" id="active-stats-view" style="display: none;">
+                <!-- AI Coach Verdict Card -->
+                <div class="sim-metric-card verdict-card">
+                  <div class="metric-header">
+                    <span class="style-badge" id="dna-badge">Empathetic-Assertive</span>
+                    <span class="verdict-score" id="dna-score">92/100</span>
+                  </div>
+                  <div class="verdict-body">
+                    <h4 class="metric-label">Tone Analysis</h4>
+                    <p class="tone-val" id="dna-tone-val">Balanced & Professional</p>
+                    <p class="verdict-desc" id="dna-verdict-text">
+                      Outstanding response. You managed to hold firm boundaries regarding your market value while respecting the budget limitations.
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Skill Meters Card -->
+                <div class="sim-metric-card meters-card">
+                  <h4 class="metric-card-title">Detailed Metrics</h4>
+                  
+                  <div class="chart-bar-group">
+                    <div class="bar-header">
+                      <span class="bar-label"><i class="inline-icon" data-lucide="shield"></i> Confidence Meter</span>
+                      <span class="bar-value" id="dna-confidence-val">85%</span>
+                    </div>
+                    <div class="bar-outer">
+                      <div class="bar-inner" id="dna-confidence-bar" style="width: 0%;"></div>
+                    </div>
+                  </div>
+                  
+                  <div class="chart-bar-group">
+                    <div class="bar-header">
+                      <span class="bar-label"><i class="inline-icon" data-lucide="heart"></i> Empathy Score</span>
+                      <span class="bar-value" id="dna-empathy-val">90%</span>
+                    </div>
+                    <div class="bar-outer">
+                      <div class="bar-inner" id="dna-empathy-bar" style="width: 0%;"></div>
+                    </div>
+                  </div>
+                  
+                  <div class="chart-bar-group">
+                    <div class="bar-header">
+                      <span class="bar-label"><i class="inline-icon" data-lucide="check-circle"></i> Clarity Score</span>
+                      <span class="bar-value" id="dna-clarity-val">92%</span>
+                    </div>
+                    <div class="bar-outer">
+                      <div class="bar-inner" id="dna-clarity-bar" style="width: 0%;"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Suggested Improvements Card -->
+                <div class="sim-metric-card improvements-card">
+                  <h4 class="metric-card-title">Suggested Improvements</h4>
+                  <ul class="improvements-list" id="dna-improvements-list">
+                    <!-- Added dynamically by JS -->
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Why Conversable Works (Lucide Icons Grid) -->
+    <section id="why-it-works" class="why-works-section">
+      <div class="container">
+        <div class="section-header text-center">
+          <div class="tag-label">Methodology</div>
+          <h2 class="section-title">Why Conversable Works<span>.</span></h2>
+          <p class="section-desc">We leverage interactive behavioral modeling to turn social anxiety into conversational strength.</p>
+        </div>
+        
+        <div class="why-works-grid">
+          <div class="why-works-card">
+            <div class="card-icon-container ai-coach-icon">
+              <i class="lucide-icon" data-lucide="brain"></i>
+            </div>
+            <h3>AI Communication Coach</h3>
+            <p>Practice conversations with intelligent AI roleplay partners that adapt dynamically to your tone and responses.</p>
+          </div>
+          <div class="why-works-card">
+            <div class="card-icon-container">
+              <i class="lucide-icon" data-lucide="message-circle"></i>
+            </div>
+            <h3>Realistic Scenarios</h3>
+            <p>Train for interviews, dating, networking, negotiations and difficult conversations curated by specialists.</p>
+          </div>
+          <div class="why-works-card">
+            <div class="card-icon-container">
+              <i class="lucide-icon" data-lucide="bar-chart-3"></i>
+            </div>
+            <h3>Instant Feedback</h3>
+            <p>Receive communication scores and detailed coaching feedback after every single session you complete.</p>
+          </div>
+          <div class="why-works-card">
+            <div class="card-icon-container">
+              <i class="lucide-icon" data-lucide="fingerprint"></i>
+            </div>
+            <h3>Communication DNA</h3>
+            <p>Discover your strengths, weaknesses, archetypes, and speaking patterns with detailed visual breakdowns.</p>
+          </div>
+          <div class="why-works-card">
+            <div class="card-icon-container">
+              <i class="lucide-icon" data-lucide="languages"></i>
+            </div>
+            <h3>50+ Languages</h3>
+            <p>Practice naturally in multiple languages including local vernacular and colloquial formats like Hinglish.</p>
+          </div>
+          <div class="why-works-card">
+            <div class="card-icon-container">
+              <i class="lucide-icon" data-lucide="trending-up"></i>
+            </div>
+            <h3>Track Improvement</h3>
+            <p>Watch your confidence and communication indicators improve over time with historical progress mapping.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Product Features -->
+    <section id="features" class="features-section">
+      <div class="container">
+        <div class="section-header text-center">
+          <div class="tag-label">The Platform</div>
+          <h2 class="section-title">Designed for deliberate growth<span>.</span></h2>
+          <p class="section-desc">
+            We stripped away notifications, badges, and gamification noise. What remains is a quiet space for conversational mastery.
+          </p>
+        </div>
+
+        <div class="features-grid">
+          <!-- Feature 1: Scenarios -->
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="lucide-icon" data-lucide="message-square"></i>
+            </div>
+            <h3 class="feature-title">High-Fidelity Scenarios</h3>
+            <p class="feature-text">
+              Over 200+ micro-simulations curated by organizational psychologists. Practice salary reviews, firing, crisis communications, and media grillings.
+            </p>
+          </div>
+
+          <!-- Feature 2: Style DNA -->
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="lucide-icon" data-lucide="fingerprint"></i>
+            </div>
+            <h3 class="feature-title">Communication DNA</h3>
+            <p class="feature-text">
+              Our models map your speaking style across four dimensions: empathy, structure, assertiveness, and cognitive flexibility.
+            </p>
+          </div>
+
+          <!-- Feature 3: Passive Learning -->
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="lucide-icon" data-lucide="clock"></i>
+            </div>
+            <h3 class="feature-title">Bite-Sized Deliberate Habit</h3>
+            <p class="feature-text">
+              No long courses. Take 5 minutes a day to handle a single high-stakes scenario. Watch your emotional regulation metrics compound over months.
+            </p>
+          </div>
+        </div>
+
+        <!-- Custom Interactive Component: Progress Dashboard Mockup -->
+        <div class="dashboard-mockup-card">
+          <div class="mockup-header">
+            <div class="mockup-dots">
+              <span></span><span></span><span></span>
+            </div>
+            <div class="mockup-title">Profile Analytics — Alex Rivera</div>
+          </div>
+          <div class="mockup-body">
+            <div class="mockup-grid">
+              <div class="mockup-column stats-col">
+                <div class="stat-group">
+                  <div class="stat-label">Daily Streak</div>
+                  <div class="stat-value">18 Days</div>
+                  <div class="stat-trend text-muted">Top 4% globally</div>
+                </div>
+                <div class="stat-group">
+                  <div class="stat-label">Communication Style Archetype</div>
+                  <div class="stat-value">Collaborative Architect</div>
+                  <div class="stat-trend text-muted">Balanced diplomatically</div>
+                </div>
+              </div>
+              <div class="mockup-column chart-col">
+                <div class="chart-header">
+                  <div class="chart-title">Weekly Skill Synthesis</div>
+                  <div class="chart-legend">
+                    <span><span class="legend-dot dot-black"></span>Empathy</span>
+                    <span><span class="legend-dot dot-gray"></span>Clarity</span>
+                  </div>
+                </div>
+                <!-- Weekly bar heights created with inline CSS -->
+                <div class="weekly-bars">
+                  <div class="bar-container">
+                    <div class="double-bars">
+                      <div class="bar-segment black" style="height: 60%;"></div>
+                      <div class="bar-segment gray" style="height: 45%;"></div>
+                    </div>
+                    <span class="day-label">Mon</span>
+                  </div>
+                  <div class="bar-container">
+                    <div class="double-bars">
+                      <div class="bar-segment black" style="height: 75%;"></div>
+                      <div class="bar-segment gray" style="height: 65%;"></div>
+                    </div>
+                    <span class="day-label">Tue</span>
+                  </div>
+                  <div class="bar-container">
+                    <div class="double-bars">
+                      <div class="bar-segment black" style="height: 85%;"></div>
+                      <div class="bar-segment gray" style="height: 80%;"></div>
+                    </div>
+                    <span class="day-label">Wed</span>
+                  </div>
+                  <div class="bar-container">
+                    <div class="double-bars">
+                      <div class="bar-segment black" style="height: 90%;"></div>
+                      <div class="bar-segment gray" style="height: 70%;"></div>
+                    </div>
+                    <span class="day-label">Thu</span>
+                  </div>
+                  <div class="bar-container">
+                    <div class="double-bars">
+                      <div class="bar-segment black" style="height: 95%;"></div>
+                      <div class="bar-segment gray" style="height: 85%;"></div>
+                    </div>
+                    <span class="day-label">Fri</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="pricing-section">
+      <div class="container">
+        <div class="section-header text-center">
+          <div class="tag-label">Pricing Plans</div>
+          <h2 class="section-title">Transparent, simple pricing<span>.</span></h2>
+          <p class="section-desc">Choose a plan that fits your professional growth journey.</p>
+        </div>
+
+        <div class="pricing-grid">
+          <!-- Tier 1 -->
+          <div class="pricing-card">
+            <div class="card-inner-top">
+              <h3 class="tier-name">Free Trial</h3>
+              <p class="tier-desc">Test the waters of social coaching.</p>
+              <div class="price-wrapper">
+                <span class="currency">$</span>
+                <span class="amount">0</span>
+                <span class="period">/ 14 days</span>
+              </div>
+            </div>
+            <hr class="pricing-divider">
+            <div class="card-inner-bottom">
+              <ul class="features-list">
+                <li>3 Active Scenarios</li>
+                <li>Basic Coach feedback</li>
+                <li>Single Device Sync</li>
+              </ul>
+              <div class="pricing-cta">
+                <a href="#signup-section" class="btn btn-secondary w-full">Start Free Trial</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tier 2 (Featured) -->
+          <div class="pricing-card featured">
+            <div class="featured-badge-wrapper">
+              <div class="featured-badge">Most Popular</div>
+            </div>
+            <div class="card-inner-top">
+              <h3 class="tier-name">Practitioner</h3>
+              <p class="tier-desc">Master your daily work relations.</p>
+              <div class="price-wrapper">
+                <span class="currency">$</span>
+                <span class="amount">15</span>
+                <span class="period">/ month</span>
+              </div>
+            </div>
+            <hr class="pricing-divider">
+            <div class="card-inner-bottom">
+              <ul class="features-list">
+                <li>Unlimited Scenarios (200+)</li>
+                <li>Full Communication DNA analysis</li>
+                <li>Premium AI coaching insights</li>
+                <li>Multi-device sync</li>
+              </ul>
+              <div class="pricing-cta">
+                <a href="#signup-section" class="btn btn-primary w-full">Go Practitioner</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tier 3 -->
+          <div class="pricing-card">
+            <div class="card-inner-top">
+              <h3 class="tier-name">Mastery</h3>
+              <p class="tier-desc">For executives & scaleup founders.</p>
+              <div class="price-wrapper">
+                <span class="currency">$</span>
+                <span class="amount">45</span>
+                <span class="period">/ month</span>
+              </div>
+            </div>
+            <hr class="pricing-divider">
+            <div class="card-inner-bottom">
+              <ul class="features-list">
+                <li>Everything in Practitioner</li>
+                <li>Customized company scenarios</li>
+                <li>Monthly executive review</li>
+                <li>Dedicated coaching channel</li>
+              </ul>
+              <div class="pricing-cta">
+                <a href="#signup-section" class="btn btn-secondary w-full">Unlock Mastery</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bottom Signup Banner -->
+    <section id="signup-section" class="bottom-signup-section">
+      <div class="container">
+        <div class="signup-banner-card">
+          <div class="tag-label text-center">Get Early Access</div>
+          <h2 class="banner-title text-center">Ready to master your social reflexes?</h2>
+          <p class="banner-desc text-center">
+            Sign up today to start your 14-day trial. Learn to deal with negotiation, conflict, and persuasion without the anxiety.
+          </p>
+          
+          <form class="banner-signup-form" id="footer-signup-form" onsubmit="event.preventDefault(); handleSignup(this);">
+            <input type="email" placeholder="Your work email" required class="form-input" id="footer-email-input" aria-label="Email Address">
+            <button type="submit" class="btn btn-primary btn-submit">
+              <span>Sign Up Now</span>
+            </button>
+          </form>
+          
+          <!-- Success Notification Widget (Hidden by default) -->
+          <div class="success-banner animate-scale-up" id="success-notification" style="display: none;">
+            <div class="success-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check" style="stroke: #FFFFFF;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+            <div>
+              <h4>Welcome to Conversable.</h4>
+              <p>We've sent an onboarding package and download link to <span id="success-email-display">your email</span>.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer-section">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <a href="#" class="logo">conversable<span>.</span></a>
+        <p class="footer-tagline">Minimalist deliberate social learning. Inspired by Nordic and Japanese design philosophies.</p>
+      </div>
+      <div class="footer-links-col">
+        <h4>Product</h4>
+        <a href="#why-it-works">Why It Works</a>
+        <a href="#playground">Interactive Simulator</a>
+        <a href="#features">Features</a>
+        <a href="#pricing">Pricing</a>
+      </div>
+      <div class="footer-links-col">
+        <h4>Legal</h4>
+        <a href="legal.html#privacy">Privacy Policy</a>
+        <a href="legal.html#terms">Terms of Service</a>
+        <a href="legal.html#cookies">Cookie Policy</a>
+        <a href="legal.html#refund">Refund Policy</a>
+        <a href="legal.html#community">Community Guidelines</a>
+        <a href="legal.html#ai">AI Usage Policy</a>
+        <a href="legal.html#deletion">Data Deletion</a>
+        <a href="legal.html#security">Security Policy</a>
+        <a href="legal.html#accessibility">Accessibility Statement</a>
+        <a href="legal.html#contact">Contact & Legal</a>
+      </div>
+      <div class="footer-links-col">
+        <h4>Connect</h4>
+        <a href="#">Twitter</a>
+        <a href="#">LinkedIn</a>
+        <a href="#">Contact Us</a>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <p>&copy; 2026 Conversable Inc. All rights reserved. Designed in Sweden & Tokyo.</p>
+    </div>
+  </footer>
+
+  <!-- Lucide Icon Library -->
+  <script src="lucide.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

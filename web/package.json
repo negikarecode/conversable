@@ -1,0 +1,23 @@
+{
+  "name": "conversable-startup-landing",
+  "version": "1.0.0",
+  "description": "Minimalist Scandinavian/Japanese-inspired landing page and live interactive playground for Conversable tech startup.",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [
+    "minimalist",
+    "landing-page",
+    "tech-startup",
+    "social-skills"
+  ],
+  "author": "Conversable Team",
+  "license": "ISC",
+  "devDependencies": {
+    "firebase-tools": "^15.22.3",
+    "vite": "^5.0.0"
+  }
+}
