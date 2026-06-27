@@ -2383,7 +2383,7 @@ span.desktop-only, a.desktop-only {
     overflow-x: hidden !important;
     width: 100% !important;
     max-width: 100% !important;
-    padding-bottom: 80px !important; /* Bottom padding for sticky CTA bar */
+    padding-bottom: 0 !important; /* Managed by footer padding */
   }
 
   /* Accessibility: prefers reduced motion */
@@ -2396,24 +2396,79 @@ span.desktop-only, a.desktop-only {
 
   /* Images rules */
   img {
-    width: 100% !important;
+    max-width: 100% !important;
     height: auto !important;
   }
 
-  /* Section global rules - Section Spacing Tightening */
+  /* Section global rules - Consistent Spacing & Center Alignment System */
   section {
-    padding-top: 36px !important;
-    padding-bottom: 36px !important;
-    padding-left: 20px !important;
-    padding-right: 20px !important;
+    padding-top: 48px !important;
+    padding-bottom: 48px !important;
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+    margin: 0 !important;
     width: 100% !important;
     max-width: 100% !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
   }
   
   .container {
     padding: 0 !important;
     width: 100% !important;
     max-width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  /* Global Typography & Content Centering */
+  h1, h2, h3, h4, h5, h6,
+  .hero-title, .section-title, .vision-title, .banner-title {
+    text-align: center !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    max-width: 100% !important;
+  }
+
+  p,
+  .hero-subtitle, .section-desc, .banner-desc, .feature-text, .footer-tagline {
+    text-align: center !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    max-width: 100% !important;
+  }
+
+  /* Global Card Centering */
+  .feature-card,
+  .why-works-card,
+  .vision-card,
+  .pricing-card {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    justify-content: center !important;
+    margin: 0 auto 16px auto !important;
+    width: 100% !important;
+    max-width: 380px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Ensure card icon containers align centered */
+  .feature-icon,
+  .card-icon-container,
+  .why-works-card .card-icon-container,
+  .vision-icon-container {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
 
   /* Section headers spacing */
@@ -2433,7 +2488,8 @@ span.desktop-only, a.desktop-only {
     font-weight: 700 !important;
     line-height: 1.1 !important;
     letter-spacing: -0.02em !important;
-    text-align: left !important;
+    text-align: center !important;
+    margin: 0 auto 12px auto !important;
   }
   
   .section-title, .vision-title, .banner-title {
@@ -2441,13 +2497,14 @@ span.desktop-only, a.desktop-only {
     font-weight: 700 !important;
     line-height: 1.2 !important;
     letter-spacing: -0.02em !important;
-    text-align: left !important;
-    margin-bottom: 12px !important; /* Gap between title and subtext */
+    text-align: center !important;
+    margin: 0 auto 12px auto !important;
   }
 
   /* Gap between section label and headline */
   .tag-label {
-    margin-bottom: 6px !important;
+    margin-bottom: 8px !important;
+    display: inline-block !important;
   }
 
   p, .hero-subtitle {
@@ -2455,39 +2512,43 @@ span.desktop-only, a.desktop-only {
     font-weight: 400 !important;
     line-height: 1.6 !important;
     color: var(--secondary) !important;
-    text-align: left !important;
+    text-align: center !important;
   }
   
   .section-desc {
-    text-align: left !important;
-    margin: 0 !important;
+    text-align: center !important;
+    margin: 0 auto 16px auto !important;
   }
 
   /* Buttons global sizing */
   .btn {
     min-height: 48px !important;
     font-size: 15px !important;
-    font-weight: 500 !important;
+    font-weight: 600 !important;
     border-radius: 12px !important;
-    width: 100% !important;
+    width: auto !important;
     padding: 0 20px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
 
   /* PART 2 - NAVBAR */
   .header {
-    height: 56px !important;
-    padding: 0 20px !important;
+    height: auto !important;
+    padding: 12px 24px !important;
     position: sticky !important;
     top: 0 !important;
     z-index: 100 !important;
-    background: var(--surface) !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
     border-bottom: 1px solid #F0F0F0 !important;
-    display: flex !important;
-    align-items: center !important;
   }
   
   .header .container.navbar {
     display: flex !important;
+    flex-direction: row !important;
     justify-content: space-between !important;
     align-items: center !important;
     padding: 0 !important;
@@ -2495,9 +2556,14 @@ span.desktop-only, a.desktop-only {
   }
   
   .logo {
-    font-size: 17px !important;
-    font-weight: 700 !important;
-    letter-spacing: -0.02em !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  .logo img {
+    height: 40px !important;
+    width: auto !important;
+    object-fit: contain !important;
   }
   
   .nav-links {
@@ -2507,6 +2573,7 @@ span.desktop-only, a.desktop-only {
   .nav-cta {
     display: flex !important;
     gap: 0 !important;
+    align-items: center !important;
   }
   
   #header-download-btn {
@@ -2516,13 +2583,16 @@ span.desktop-only, a.desktop-only {
   #header-cta-btn {
     background: black !important;
     color: white !important;
-    padding: 10px 18px !important;
+    padding: 0 16px !important;
     border-radius: 100px !important;
-    font-size: 14px !important;
-    font-weight: 500 !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
     min-height: unset !important;
     height: 38px !important;
     width: auto !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
 
   /* PART 3 - HERO SECTION */
@@ -2537,21 +2607,32 @@ span.desktop-only, a.desktop-only {
   }
   
   .hero-content {
-    text-align: left !important;
+    text-align: center !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
   }
   
   .hero-badge {
     font-size: 11px !important;
     padding: 6px 14px !important;
-    margin-bottom: 16px !important;
+    margin: 0 auto 16px auto !important;
+    display: inline-block !important;
   }
   
   .hero-subtitle {
     font-size: 15px !important;
     line-height: 1.55 !important;
     color: #4A4A4A !important;
-    margin-bottom: 20px !important; /* Breathing room before email input */
-    text-align: left !important;
+    margin: 0 auto 24px auto !important; /* Breathing room before email input */
+    text-align: center !important;
+    max-width: 100% !important;
+  }
+
+  #hero-signup-form {
+    width: 100% !important;
+    max-width: 420px !important;
+    margin: 0 auto !important;
   }
   
   #hero-signup-form .form-group {
@@ -2566,21 +2647,24 @@ span.desktop-only, a.desktop-only {
   
   #hero-signup-form .form-input {
     width: 100% !important;
-    height: 54px !important;
+    height: 58px !important;
     background: var(--surface) !important;
-    border: 1px solid var(--border) !important;
+    border: 1.5px solid var(--border) !important;
     border-radius: 12px !important;
     padding: 0 20px !important;
-    margin-bottom: 8px !important;
-    font-size: 15px !important;
+    margin-bottom: 12px !important;
+    font-size: 16px !important;
+    text-align: center !important;
   }
   
   #hero-signup-form .btn-submit {
     width: 100% !important;
-    height: 54px !important;
+    height: 58px !important;
     margin-top: 0 !important;
     border-radius: 12px !important;
-    padding: 0 !important;
+    padding: 0 24px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -2966,8 +3050,8 @@ span.desktop-only, a.desktop-only {
   
   .pricing-card .btn {
     width: 100% !important;
-    height: 48px !important;
-    font-size: 14px !important;
+    height: 58px !important;
+    font-size: 16px !important;
     font-weight: 600 !important;
     border-radius: 12px !important;
     padding: 0 !important;
@@ -3019,28 +3103,32 @@ span.desktop-only, a.desktop-only {
   .banner-signup-form {
     display: flex !important;
     flex-direction: column !important;
-    gap: 8px !important;
+    gap: 0 !important;
     width: 100% !important;
-    margin-top: 24px !important;
+    max-width: 420px !important;
+    margin: 24px auto 0 auto !important;
   }
   
   .banner-signup-form .form-input {
     width: 100% !important;
-    height: 54px !important;
+    height: 58px !important;
     background: var(--surface) !important;
-    border: 1px solid var(--border) !important;
+    border: 1.5px solid var(--border) !important;
     border-radius: 12px !important;
     padding: 0 20px !important;
-    margin: 0 !important;
-    font-size: 15px !important;
+    margin-bottom: 12px !important;
+    font-size: 16px !important;
+    text-align: center !important;
   }
   
   .banner-signup-form .btn-submit {
     width: 100% !important;
-    height: 54px !important;
+    height: 58px !important;
     border-radius: 12px !important;
     margin: 0 !important;
-    padding: 0 !important;
+    padding: 0 24px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -3048,9 +3136,10 @@ span.desktop-only, a.desktop-only {
 
   /* PART 11 - FOOTER */
   .footer-section {
-    padding: 32px 0 24px 0 !important;
-    border-top: 1px solid #EBEBEB !important;
-    background: var(--surface) !important;
+    padding: 32px 0 96px 0 !important; /* Contain sticky CTA offset inside footer color */
+    border-top: 1px solid #222222 !important;
+    background: var(--primary) !important; /* Unified dark Japandi theme footer */
+    color: var(--surface) !important;
   }
   
   .footer-mobile-wrapper {
@@ -3062,52 +3151,60 @@ span.desktop-only, a.desktop-only {
   }
   
   .footer-mobile-logo {
-    font-size: 15px !important;
-    font-weight: 700 !important;
-    letter-spacing: -0.02em !important;
     text-decoration: none !important;
-    color: var(--primary) !important;
-  }
-  
-  .footer-mobile-logo span {
-    color: var(--primary) !important;
-  }
-  
-  .footer-mobile-tagline {
-    font-size: 12px !important;
-    color: #6B6B80 !important;
-    margin-top: 4px !important;
-    font-weight: 400 !important;
-  }
-  
-  .footer-mobile-links {
-    margin-top: 20px !important;
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
-    gap: 8px !important;
+    margin-bottom: 8px !important;
+  }
+  
+  .footer-mobile-logo img {
+    height: 48px !important;
+    width: auto !important;
+    object-fit: contain !important;
+  }
+  
+  .footer-mobile-tagline {
+    font-size: 13px !important;
+    color: #888888 !important;
+    margin-top: 4px !important;
+    font-weight: 400 !important;
+    text-align: center !important;
+  }
+  
+  .footer-mobile-links {
+    margin-top: 16px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 12px !important;
   }
   
   .footer-mobile-links a {
-    font-size: 12px !important;
-    color: #6B6B80 !important;
+    font-size: 13px !important;
+    color: #CCCCCC !important;
     text-decoration: none !important;
-    font-weight: 400 !important;
+    font-weight: 500 !important;
+  }
+  
+  .footer-mobile-links a:hover {
+    color: #FFFFFF !important;
   }
   
   .footer-mobile-separator {
-    font-size: 12px !important;
-    color: #6B6B80 !important;
+    font-size: 13px !important;
+    color: #444444 !important;
   }
   
   .footer-mobile-bottom {
-    margin-top: 16px !important;
+    margin-top: 12px !important;
   }
   
   .footer-mobile-bottom p {
-    font-size: 11px !important;
-    color: #6B6B80 !important;
+    font-size: 12px !important;
+    color: #666666 !important;
     font-weight: 400 !important;
+    text-align: center !important;
   }
 
   /* FIX 3 - SIMULATOR DEMO SEPARATION */
