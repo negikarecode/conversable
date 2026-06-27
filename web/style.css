@@ -232,7 +232,9 @@ p {
 }
 
 .tag-label {
-  display: inline-block;
+  display: block;
+  width: fit-content;
+  margin: 0 auto var(--space-sm) auto;
   background-color: var(--primary);
   color: var(--surface);
   font-size: 0.72rem;
@@ -241,7 +243,6 @@ p {
   text-transform: uppercase;
   padding: 0.4rem 1rem;
   border-radius: var(--radius-pill);
-  margin-bottom: var(--space-sm);
 }
 
 .text-center .tag-label {
@@ -278,7 +279,7 @@ p {
   border: 1px solid var(--border);
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   align-items: center;
-  height: 58px;
+  height: 62px;
   box-sizing: border-box;
 }
 
@@ -293,7 +294,7 @@ p {
   background: transparent;
   padding: 0 20px;
   font-family: var(--font-main);
-  font-size: 1rem;
+  font-size: 1.15rem;
   color: var(--primary);
   outline: none;
   height: 100%;
@@ -301,6 +302,7 @@ p {
 
 .form-input::placeholder {
   color: var(--secondary-light);
+  font-size: 1.15rem;
 }
 
 .form-meta {
@@ -802,6 +804,17 @@ p {
   border-color: #888888;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.option-btn.selected {
+  border-color: var(--primary) !important;
+  background-color: var(--surface-alt) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05) !important;
+}
+
+.option-btn.disabled {
+  opacity: 0.45 !important;
+  pointer-events: none !important;
 }
 
 .opt-badge {
@@ -1515,7 +1528,7 @@ p {
   max-width: 500px;
   margin: var(--space-md) auto 0 auto;
   align-items: center;
-  height: 58px;
+  height: 62px;
 }
 
 .banner-signup-form .form-input {
@@ -1525,7 +1538,7 @@ p {
   border-radius: 100px;
   padding: 0 24px;
   font-family: var(--font-main);
-  font-size: 1rem;
+  font-size: 1.15rem;
   color: var(--primary);
   outline: none;
   height: 100%;
@@ -2647,23 +2660,23 @@ span.desktop-only, a.desktop-only {
   
   #hero-signup-form .form-input {
     width: 100% !important;
-    height: 58px !important;
+    height: 62px !important;
     background: var(--surface) !important;
     border: 1.5px solid var(--border) !important;
     border-radius: 12px !important;
     padding: 0 20px !important;
     margin-bottom: 12px !important;
-    font-size: 16px !important;
+    font-size: 18px !important;
     text-align: center !important;
   }
   
   #hero-signup-form .btn-submit {
     width: 100% !important;
-    height: 58px !important;
+    height: 62px !important;
     margin-top: 0 !important;
     border-radius: 12px !important;
     padding: 0 24px !important;
-    font-size: 16px !important;
+    font-size: 18px !important;
     font-weight: 600 !important;
     display: flex !important;
     align-items: center !important;
@@ -2689,20 +2702,21 @@ span.desktop-only, a.desktop-only {
     text-transform: uppercase !important;
     letter-spacing: 0.08em !important;
     margin-bottom: 8px !important;
-    display: block !important;
-    text-align: left !important;
+    display: inline-block !important;
+    text-align: center !important;
     border-radius: 0 !important;
   }
   
   .tag-label.hero-badge {
-    display: inline-block !important;
+    display: block !important;
+    width: fit-content !important;
     background-color: var(--primary) !important;
     color: var(--surface) !important;
     font-size: 11px !important;
     padding: 6px 14px !important;
     border-radius: var(--radius-pill) !important;
-    text-align: left !important;
-    margin-bottom: 16px !important;
+    text-align: center !important;
+    margin: 0 auto 16px auto !important;
   }
 
   /* FIX 1 & PART 5 - ALL FEATURE CARDS IN GRID */
@@ -2771,7 +2785,8 @@ span.desktop-only, a.desktop-only {
   
   .see-all-features-link {
     text-align: center !important;
-    margin-top: 12px !important;
+    margin-top: 24px !important;
+    margin-bottom: 40px !important;
     display: block !important;
   }
   
@@ -2932,7 +2947,7 @@ span.desktop-only, a.desktop-only {
   }
   
   .mockup-body {
-    padding: 16px !important;
+    padding: 20px !important;
   }
   
   .mockup-grid {
@@ -3111,23 +3126,23 @@ span.desktop-only, a.desktop-only {
   
   .banner-signup-form .form-input {
     width: 100% !important;
-    height: 58px !important;
+    height: 62px !important;
     background: var(--surface) !important;
     border: 1.5px solid var(--border) !important;
     border-radius: 12px !important;
     padding: 0 20px !important;
     margin-bottom: 12px !important;
-    font-size: 16px !important;
+    font-size: 18px !important;
     text-align: center !important;
   }
   
   .banner-signup-form .btn-submit {
     width: 100% !important;
-    height: 58px !important;
+    height: 62px !important;
     border-radius: 12px !important;
     margin: 0 !important;
     padding: 0 24px !important;
-    font-size: 16px !important;
+    font-size: 18px !important;
     font-weight: 600 !important;
     display: flex !important;
     align-items: center !important;

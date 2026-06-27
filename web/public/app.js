@@ -226,10 +226,6 @@ function resetSimulator() {
   const buttons = document.querySelectorAll('.option-btn');
   buttons.forEach(btn => {
     btn.classList.remove('selected', 'disabled');
-    btn.style.opacity = '1';
-    btn.style.pointerEvents = 'auto';
-    btn.style.borderColor = '';
-    btn.style.backgroundColor = '';
   });
 
   // Reset Stats View
@@ -255,17 +251,13 @@ function chooseOption(index) {
   const data = simulatorData[currentScenario];
   const choice = data.options[optionIndex];
 
-  // Highlight selected option and disable others
+  // Highlight selected option and disable others using CSS classes
   const buttons = document.querySelectorAll('.option-btn');
   buttons.forEach((btn, idx) => {
     if (idx === optionIndex) {
       btn.classList.add('selected');
-      btn.style.borderColor = 'var(--primary)';
-      btn.style.backgroundColor = 'var(--surface-alt)';
     } else {
       btn.classList.add('disabled');
-      btn.style.opacity = '0.4';
-      btn.style.pointerEvents = 'none';
     }
   });
 
