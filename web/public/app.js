@@ -339,6 +339,28 @@ function handleSignup(formElement) {
   }, 1200);
 }
 
+// APK Download Toast
+function showDownloadToast(event) {
+  if (event) event.preventDefault();
+  let toast = document.getElementById('apk-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'apk-toast';
+    toast.textContent = "APK coming soon! Join the waitlist above.";
+    document.body.appendChild(toast);
+  }
+  // Trigger reflow
+  toast.offsetHeight;
+  toast.classList.add('show');
+  
+  if (window.toastTimeout) {
+    clearTimeout(window.toastTimeout);
+  }
+  window.toastTimeout = setTimeout(() => {
+    toast.classList.remove('show');
+  }, 3000);
+}
+
 // Initialize on page load
 window.addEventListener('DOMContentLoaded', () => {
   if (typeof lucide !== 'undefined') {
@@ -346,17 +368,32 @@ window.addEventListener('DOMContentLoaded', () => {
   }
   resetSimulator();
 
-  // Sticky CTA Bar scroll behavior
-  const heroSignupForm = document.getElementById('hero-signup-form');
-  const stickyCtaBar = document.getElementById('sticky-cta-bar');
-  if (heroSignupForm && stickyCtaBar) {
+  // Sticky CTA Bar scroll behavior (combined logic)
+  const stickyBar = document.getElementById('sticky-cta-bar');
+  if (stickyBar) {
     const handleScroll = () => {
-      const rect = heroSignupForm.getBoundingClientRect();
-      if (rect.bottom < 0) {
-        stickyCtaBar.classList.remove('visible');
+      const pricingSection = document.getElementById('pricing');
+      const ctaSection = document.getElementById('signup-section');
+      const footerSection = document.querySelector('.footer-section');
+      const heroSection = document.querySelector('.hero-section');
+      
+      const scrollY = window.scrollY + window.innerHeight;
+      const heroHeight = heroSection?.offsetHeight || 400;
+      
+      const isPastHero = window.scrollY > heroHeight;
+      
+      const hideZones = [pricingSection, ctaSection, footerSection]
+        .filter(Boolean)
+        .map(el => el.offsetTop - 200);
+      
+      const shouldHide = hideZones.some(zone => scrollY >= zone + 200);
+      
+      if (isPastHero && !shouldHide && window.innerWidth <= 768) {
+        stickyBar.style.transform = 'translateY(0)';
       } else {
-        stickyCtaBar.classList.add('visible');
+        stickyBar.style.transform = 'translateY(100%)';
       }
+      stickyBar.style.transition = 'transform 250ms ease';
     };
     window.addEventListener('scroll', handleScroll);
     window.addEventListener('resize', handleScroll);

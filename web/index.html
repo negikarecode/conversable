@@ -78,8 +78,24 @@
           </form>
         </div>
 
+        <!-- APK Download Banner (Mobile Only) -->
+        <div class="apk-download-banner mobile-only">
+          <div class="apk-top-label">ANDROID APP</div>
+          <h3 class="apk-title">Download Conversable</h3>
+          <p class="apk-subtitle">Full app with voice mode & AI coaching</p>
+          <a href="#download" onclick="showDownloadToast(event)" class="btn btn-primary apk-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#1A1A2E">
+              <path d="M17.523 15.341a.738.738 0 0 1-.735.74.738.738 0 0 1-.735-.74V10.6a.738.738 0 0 1 .735-.74c.406 0 .735.33.735.74v4.741zm-10.046 0a.738.738 0 0 1-.735.74.738.738 0 0 1-.735-.74V10.6a.738.738 0 0 1 .735-.74c.406 0 .735.33.735.74v4.741zM15.863 5.85l.98-1.79a.2.2 0 0 0-.076-.272.2.2 0 0 0-.272.076l-.992 1.814A6.14 6.14 0 0 0 12 5.1a6.14 6.14 0 0 0-3.503 1.078L7.505 4.364a.2.2 0 0 0-.272-.076.2.2 0 0 0-.076.272l.98 1.79C6.61 7.14 5.73 8.7 5.73 10.46v.046h12.54v-.046c0-1.76-.88-3.32-2.407-4.61zM9.5 8.97a.5.5 0 0 1-.5-.5.5.5 0 0 1 .5-.5.5.5 0 0 1 .5.5.5.5 0 0 1-.5.5zm5 0a.5.5 0 0 1-.5-.5.5.5 0 0 1 .5-.5.5.5 0 0 1 .5.5.5.5 0 0 1-.5.5zM5.73 17.52c0 .685.56 1.24 1.248 1.24h.87v2.5c0 .407.33.74.735.74.406 0 .735-.333.735-.74v-2.5h1.364v2.5c0 .407.33.74.736.74.405 0 .735-.333.735-.74v-2.5h.87c.688 0 1.247-.555 1.247-1.24v-7.014H5.73V17.52z"/>
+            </svg>
+            <span>Download APK</span>
+          </a>
+          <div class="apk-meta">v1.0 · Free · 18MB</div>
+        </div>
+
         <!-- Hero Visual / Floating Preview Card (Right) -->
         <div class="hero-visual">
+          <div class="simulator-demo-divider mobile-only"></div>
+          <div class="simulator-demo-label mobile-only">TRY IT NOW</div>
           <div class="preview-card-container">
             <!-- Simulated Conversation Card -->
             <div class="preview-card interactive-bubble-card">
@@ -92,7 +108,7 @@
                   </div>
                 </div>
                 <div class="scenario-tag desktop-only">Scenario: Raising Seed Round</div>
-                <div class="scenario-tag mobile-only">Raising Seed Round</div>
+                <div class="scenario-tag mobile-only">Seed Round</div>
               </div>
               <div class="card-body">
                 <div class="chat-message partner">
@@ -113,10 +129,10 @@
                 <p class="action-prompt">Choose how you'd reply:</p>
                 <div class="action-buttons">
                   <button type="button" class="btn btn-secondary btn-sm" onclick="triggerHeroDemo('defensive')">
-                    "Our tech is 10x better than competitor X, so their marketing budget doesn't matter."
+                    <span class="mobile-only opt-pill">A</span>"Our tech is 10x better than competitor X, so their marketing budget doesn't matter."
                   </button>
                   <button type="button" class="btn btn-secondary btn-sm" onclick="triggerHeroDemo('empathetic')">
-                    "Competitor X's CAC is lower due to paid ads. We rely on organic developer word-of-mouth. Let me share our growth metrics."
+                    <span class="mobile-only opt-pill">B</span>"Competitor X's CAC is lower due to paid ads. We rely on organic developer word-of-mouth. Let me share our growth metrics."
                   </button>
                 </div>
               </div>
@@ -132,7 +148,8 @@
         <div class="tag-label">Our Vision</div>
         <h2 class="vision-title">Built for people who want to communicate with confidence<span>.</span></h2>
         <p class="vision-body">
-          Whether it's an interview, a first date, a sales call, a difficult conversation, or everyday communication, Conversable helps you practice before it matters.
+          <span class="desktop-only">Whether it's an interview, a first date, a sales call, a difficult conversation, or everyday communication, Conversable helps you practice before it matters.</span>
+          <span class="mobile-only">Whether it's an interview, a first date, or a difficult conversation — Conversable helps you practice before it matters.</span>
         </p>
         
         <div class="vision-grid">
@@ -141,28 +158,28 @@
               <i class="lucide-icon" data-lucide="target"></i>
             </div>
             <h3>Unlimited Practice</h3>
-            <p>Refine your speaking skills and test alternate responses without limits.</p>
+            <p><span class="desktop-only">Refine your speaking skills and test alternate responses without limits.</span><span class="mobile-only">Refine speaking skills without limits.</span></p>
           </div>
           <div class="vision-card">
             <div class="vision-icon-container">
               <i class="lucide-icon" data-lucide="bot"></i>
             </div>
             <h3>AI Powered Coaching</h3>
-            <p>Benefit from models trained on advanced social psychology frameworks.</p>
+            <p><span class="desktop-only">Benefit from models trained on advanced social psychology frameworks.</span><span class="mobile-only">AI partners that adapt to your tone.</span></p>
           </div>
           <div class="vision-card">
             <div class="vision-icon-container">
               <i class="lucide-icon" data-lucide="globe"></i>
             </div>
             <h3>Global Language Support</h3>
-            <p>Speak in your natural tongue, with seamless support for Hinglish and local slang.</p>
+            <p><span class="desktop-only">Speak in your natural tongue, with seamless support for Hinglish and local slang.</span><span class="mobile-only">Practice in 50+ languages and dialects.</span></p>
           </div>
           <div class="vision-card">
             <div class="vision-icon-container">
               <i class="lucide-icon" data-lucide="zap"></i>
             </div>
             <h3>Personalized Feedback</h3>
-            <p>Observe your behavioral metrics adapt dynamically with every statement.</p>
+            <p><span class="desktop-only">Observe your behavioral metrics adapt dynamically with every statement.</span><span class="mobile-only">Observe your behavioral metrics adapt dynamically.</span></p>
           </div>
         </div>
       </div>
@@ -349,47 +366,42 @@
               <i class="lucide-icon" data-lucide="brain"></i>
             </div>
             <h3>AI Communication Coach</h3>
-            <p class="desktop-only">Practice conversations with intelligent AI roleplay partners that adapt dynamically to your tone and responses.</p>
-            <p class="mobile-only">Practice with AI partners that adapt to your tone.</p>
+            <p><span class="desktop-only">Practice conversations with intelligent AI roleplay partners that adapt dynamically to your tone and responses.</span><span class="mobile-only">Practice with AI that reacts like a real person.</span></p>
           </div>
           <div class="why-works-card">
             <div class="card-icon-container">
               <i class="lucide-icon" data-lucide="message-circle"></i>
             </div>
             <h3>Realistic Scenarios</h3>
-            <p class="desktop-only">Train for interviews, dating, networking, negotiations and difficult conversations curated by specialists.</p>
-            <p class="mobile-only">Train for interviews, dates, negotiations, and more.</p>
+            <p><span class="desktop-only">Train for interviews, dating, networking, negotiations and difficult conversations curated by specialists.</span><span class="mobile-only">Train for interviews, dates, and negotiations.</span></p>
           </div>
           <div class="why-works-card">
             <div class="card-icon-container">
               <i class="lucide-icon" data-lucide="bar-chart-3"></i>
             </div>
             <h3>Instant Feedback</h3>
-            <p class="desktop-only">Receive communication scores and detailed coaching feedback after every single session you complete.</p>
-            <p class="mobile-only">Get coaching scores after every session.</p>
+            <p><span class="desktop-only">Receive communication scores and detailed coaching feedback after every single session you complete.</span><span class="mobile-only">Coaching scores after every session.</span></p>
           </div>
           <div class="why-works-card">
             <div class="card-icon-container">
               <i class="lucide-icon" data-lucide="fingerprint"></i>
             </div>
             <h3>Communication DNA</h3>
-            <p class="desktop-only">Discover your strengths, weaknesses, archetypes, and speaking patterns with detailed visual breakdowns.</p>
-            <p class="mobile-only">Map your speaking style across empathy, clarity, and confidence.</p>
+            <p><span class="desktop-only">Discover your strengths, weaknesses, archetypes, and speaking patterns with detailed visual breakdowns.</span><span class="mobile-only">Maps your speaking style across 4 dimensions.</span></p>
           </div>
           <div class="why-works-card">
             <div class="card-icon-container">
               <i class="lucide-icon" data-lucide="languages"></i>
             </div>
             <h3>50+ Languages</h3>
-            <p>Practice naturally in multiple languages including local vernacular and colloquial formats like Hinglish.</p>
+            <p><span class="desktop-only">Practice naturally in multiple languages including local vernacular and colloquial formats like Hinglish.</span><span class="mobile-only">Practice in 50+ languages and Hinglish.</span></p>
           </div>
           <div class="why-works-card">
             <div class="card-icon-container">
               <i class="lucide-icon" data-lucide="trending-up"></i>
             </div>
             <h3>Track Improvement</h3>
-            <p class="desktop-only">Watch your confidence and communication indicators improve over time with historical progress mapping.</p>
-            <p class="mobile-only">Watch your skills improve with session history.</p>
+            <p><span class="desktop-only">Watch your confidence and communication indicators improve over time with historical progress mapping.</span><span class="mobile-only">Watch your skills grow session by session.</span></p>
           </div>
         </div>
       </div>
@@ -414,7 +426,8 @@
             </div>
             <h3 class="feature-title">High-Fidelity Scenarios</h3>
             <p class="feature-text">
-              Over 200+ micro-simulations curated by organizational psychologists. Practice salary reviews, firing, crisis communications, and media grillings.
+              <span class="desktop-only">Over 200+ micro-simulations curated by organizational psychologists. Practice salary reviews, firing, crisis communications, and media grillings.</span>
+              <span class="mobile-only">200+ scenarios for work, dating, and life.</span>
             </p>
           </div>
 
@@ -425,7 +438,8 @@
             </div>
             <h3 class="feature-title">Communication DNA</h3>
             <p class="feature-text">
-              Our models map your speaking style across four dimensions: empathy, structure, assertiveness, and cognitive flexibility.
+              <span class="desktop-only">Our models map your speaking style across four dimensions: empathy, structure, assertiveness, and cognitive flexibility.</span>
+              <span class="mobile-only">Maps your speaking style across 4 dimensions.</span>
             </p>
           </div>
 
@@ -435,11 +449,9 @@
               <i class="lucide-icon" data-lucide="clock"></i>
             </div>
             <h3 class="feature-title">Bite-Sized Deliberate Habit</h3>
-            <p class="feature-text desktop-only">
-              No long courses. Take 5 minutes a day to handle a single high-stakes scenario. Watch your emotional regulation metrics compound over months.
-            </p>
-            <p class="feature-text mobile-only">
-              5 minutes a day. Real improvement over weeks.
+            <p class="feature-text">
+              <span class="desktop-only">No long courses. Take 5 minutes a day to handle a single high-stakes scenario. Watch your emotional regulation metrics compound over months.</span>
+              <span class="mobile-only">5 minutes a day. Real results over time.</span>
             </p>
           </div>
         </div>
@@ -550,7 +562,10 @@
           <div class="pricing-card">
             <div class="card-inner-top">
               <h3 class="tier-name">Free Trial</h3>
-              <p class="tier-desc">Test the waters of social coaching.</p>
+              <p class="tier-desc">
+                <span class="desktop-only">Test the waters of social coaching.</span>
+                <span class="mobile-only">Try it free. No card needed.</span>
+              </p>
               <div class="price-wrapper">
                 <span class="currency">$</span>
                 <span class="amount">0</span>
@@ -560,12 +575,15 @@
             <hr class="pricing-divider">
             <div class="card-inner-bottom">
               <ul class="features-list">
-                <li>3 Active Scenarios</li>
-                <li>Basic Coach feedback</li>
-                <li>Single Device Sync</li>
+                <li><span class="desktop-only">3 Active Scenarios</span><span class="mobile-only">3 scenarios</span></li>
+                <li><span class="desktop-only">Basic Coach feedback</span><span class="mobile-only">Basic coaching</span></li>
+                <li><span class="desktop-only">Single Device Sync</span><span class="mobile-only">Single device</span></li>
               </ul>
               <div class="pricing-cta">
-                <a href="#signup-section" class="btn btn-secondary w-full">Start Free Trial</a>
+                <a href="#signup-section" class="btn btn-secondary w-full">
+                  <span class="desktop-only">Start Free Trial</span>
+                  <span class="mobile-only">Try Free</span>
+                </a>
               </div>
             </div>
           </div>
@@ -577,7 +595,10 @@
             </div>
             <div class="card-inner-top">
               <h3 class="tier-name">Practitioner</h3>
-              <p class="tier-desc">Master your daily work relations.</p>
+              <p class="tier-desc">
+                <span class="desktop-only">Master your daily work relations.</span>
+                <span class="mobile-only">For serious daily practice.</span>
+              </p>
               <div class="price-wrapper">
                 <span class="currency">$</span>
                 <span class="amount">15</span>
@@ -587,13 +608,16 @@
             <hr class="pricing-divider">
             <div class="card-inner-bottom">
               <ul class="features-list">
-                <li>Unlimited Scenarios (200+)</li>
-                <li>Full Communication DNA analysis</li>
-                <li>Premium AI coaching insights</li>
-                <li>Multi-device sync</li>
+                <li><span class="desktop-only">Unlimited Scenarios (200+)</span><span class="mobile-only">200+ scenarios</span></li>
+                <li><span class="desktop-only">Full Communication DNA analysis</span><span class="mobile-only">Full skill analysis</span></li>
+                <li><span class="desktop-only">Premium AI coaching insights</span><span class="mobile-only">Premium coaching</span></li>
+                <li><span class="desktop-only">Multi-device sync</span><span class="mobile-only">All devices</span></li>
               </ul>
               <div class="pricing-cta">
-                <a href="#signup-section" class="btn btn-primary w-full">Go Practitioner</a>
+                <a href="#signup-section" class="btn btn-primary w-full">
+                  <span class="desktop-only">Go Practitioner</span>
+                  <span class="mobile-only">Get Practitioner</span>
+                </a>
               </div>
             </div>
           </div>
@@ -726,6 +750,14 @@
 
   <!-- Sticky CTA Bar at bottom -->
   <div id="sticky-cta-bar" class="mobile-only">
+    <button class="btn-sticky-apk" onclick="showDownloadToast(event)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      <span>APK</span>
+    </button>
     <button class="btn-sticky-ghost" onclick="document.getElementById('pricing').scrollIntoView({ behavior: 'smooth' });">See pricing</button>
     <button class="btn-sticky-primary" onclick="document.getElementById('signup-section').scrollIntoView({ behavior: 'smooth' });">Start free</button>
   </div>
