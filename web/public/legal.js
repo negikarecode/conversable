@@ -36,7 +36,7 @@ function handleRouting() {
   const hash = window.location.hash || '#privacy';
   const policyId = hash.replace('#', '');
   
-  const validPolicies = ['privacy', 'terms', 'cookies', 'refund', 'community', 'ai', 'deletion', 'security', 'accessibility', 'contact'];
+  const validPolicies = ['privacy', 'terms', 'cookies', 'community', 'ai', 'deletion', 'security', 'accessibility', 'contact'];
   if (!validPolicies.includes(policyId)) {
     return;
   }

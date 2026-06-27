@@ -62,17 +62,17 @@
             <div class="form-row">
               <input type="email" placeholder="Enter your work email" required class="form-input" id="hero-email-input" aria-label="Email Address">
               <button type="submit" class="btn btn-primary btn-submit" id="hero-submit-btn">
-                <span>Start Training Free</span>
+                <span>Get Started</span>
                 <i class="btn-arrow-icon" data-lucide="arrow-right"></i>
               </button>
             </div>
             <div class="form-meta desktop-only" style="display: flex; flex-wrap: wrap; gap: 8px 16px;">
-              <span>✓ Free 14-day trial</span>
+              <span>✓ 100% Free App</span>
               <span>✓ No credit card required</span>
               <span>• <a href="/conversable.apk" download style="color: var(--color-text-primary); font-weight: 600; text-decoration: underline;" onclick="handleApkDownload(event, this)">Download Android APK</a></span>
             </div>
             <div class="form-meta-mobile mobile-only">
-              Free 14-day trial. No credit card.
+              Completely free. No credit card required.
             </div>
           </form>
         </div>
@@ -557,10 +557,10 @@
           <h2 class="banner-title text-center desktop-only">Ready to master your social reflexes?</h2>
           <h2 class="banner-title text-left mobile-only">Ready to level up?</h2>
           <p class="banner-desc text-center desktop-only">
-            Sign up today to start your 14-day trial. Learn to deal with negotiation, conflict, and persuasion without the anxiety.
+            Sign up today to start your communication training. Learn to deal with negotiation, conflict, and persuasion without the anxiety.
           </p>
           <p class="banner-desc text-left mobile-only">
-            Start your 14-day free trial. No card needed.
+            Start practicing now. Completely free, no card needed.
           </p>
           
           <form class="banner-signup-form" id="footer-signup-form" onsubmit="event.preventDefault(); handleSignup(this);">
@@ -590,12 +590,15 @@
   <!-- Footer -->
   <footer class="footer-section">
     <div class="container footer-wrapper">
-      <!-- Logo -->
+      <!-- Logo & Brand -->
       <a href="index.html" class="footer-logo">
-        <img src="/logo1.png" alt="conversable.">
+        <img src="/logo1.png" alt="Conversable">
       </a>
+      <span class="footer-brand-name">Conversable</span>
       <!-- Tagline -->
       <p class="footer-tagline">Minimalist deliberate social learning. Inspired by Nordic and Japanese design philosophies.</p>
+      <!-- Contact Email -->
+      <p class="footer-email">Email: <a href="mailto:conversableapp@gmail.com">conversableapp@gmail.com</a></p>
       <!-- Navigation Links -->
       <div class="footer-links">
         <a href="index.html#why-it-works">Why It Works</a>
@@ -603,6 +606,7 @@
         <a href="legal.html#privacy">Privacy Policy</a>
         <a href="legal.html#terms">Terms of Service</a>
         <a href="legal.html#contact">Contact</a>
+        <a href="https://github.com/negikarecode/conversable" target="_blank" rel="noopener">GitHub</a>
       </div>
       <!-- Copyright -->
       <div class="footer-copyright">
@@ -619,9 +623,10 @@
         <polyline points="7 10 12 15 17 10"/>
         <line x1="12" y1="15" x2="12" y2="3"/>
       </svg>
-      <span>APK</span>
+      <span>Download APK</span>
     </button>
-    <button class="btn-sticky-primary" onclick="document.getElementById('signup-section').scrollIntoView({ behavior: 'smooth' });">Start free</button>
+    <button class="btn-sticky-ghost" onclick="document.getElementById('features').scrollIntoView({ behavior: 'smooth' });">Features</button>
+    <button class="btn-sticky-primary" onclick="document.getElementById('signup-section').scrollIntoView({ behavior: 'smooth' });">Get Started</button>
   </div>
 
   <!-- Lucide Icon Library -->

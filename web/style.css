@@ -1712,6 +1712,27 @@ p {
   text-align: center;
 }
 
+.footer-brand-name {
+  font-family: var(--font-main);
+  font-weight: 800;
+  font-size: 1.5rem;
+  letter-spacing: -0.03em;
+  margin-bottom: var(--space-xs);
+  display: block;
+}
+
+.footer-email {
+  color: var(--secondary-light);
+  font-size: 0.9rem;
+  margin-bottom: var(--space-sm);
+  opacity: 0.85;
+}
+
+.footer-email a {
+  color: var(--surface) !important;
+  text-decoration: underline !important;
+}
+
 .footer-links {
   display: flex;
   flex-wrap: wrap;
@@ -3478,5 +3499,50 @@ span.desktop-only, a.desktop-only {
   #apk-toast.show {
     transform: translate(-50%, 0) !important;
     opacity: 1 !important;
+  }
+
+  /* Mobile Spacing & Layout Hardening Overrides */
+  .signup-banner-card {
+    padding: 32px 24px !important;
+  }
+  
+  .signup-banner-card .banner-title {
+    margin-top: 0 !important;
+    margin-bottom: 16px !important;
+    font-size: 24px !important;
+  }
+  
+  .signup-banner-card .banner-desc {
+    margin-top: 0 !important;
+    margin-bottom: 24px !important;
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+  }
+
+  .banner-signup-form {
+    height: auto !important;
+    margin: 24px auto 0 auto !important;
+  }
+
+  #hero-signup-form .form-input,
+  .banner-signup-form .form-input {
+    height: 72px !important;
+    line-height: 72px !important;
+    font-size: 16px !important;
+    padding: 0 24px !important;
+    box-sizing: border-box !important;
+  }
+
+  #hero-signup-form .btn-submit,
+  .banner-signup-form .btn-submit {
+    height: 72px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    padding: 0 32px !important;
+    box-sizing: border-box !important;
   }
 }
