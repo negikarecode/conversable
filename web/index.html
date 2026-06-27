@@ -49,10 +49,13 @@
       <div class="container hero-grid">
         <!-- Hero Content (Left) -->
         <div class="hero-content">
-          <div class="tag-label">AI Social Simulation</div>
+          <div class="tag-label hero-badge">AI Social Simulation</div>
           <h1 class="hero-title">Train your social reflexes<span>.</span></h1>
-          <p class="hero-subtitle">
+          <p class="hero-subtitle desktop-only">
             An interactive, distraction-free playground to master high-stakes conversations. Practice salary negotiations, public speaking, or difficult workplace conversations and get instant coaching feedback.
+          </p>
+          <p class="hero-subtitle mobile-only">
+            Practice salary negotiations, first dates, and difficult conversations with AI. Get instant coaching feedback.
           </p>
           
           <!-- Hero Signup Form -->
@@ -64,10 +67,13 @@
                 <i class="btn-arrow-icon" data-lucide="arrow-right"></i>
               </button>
             </div>
-            <div class="form-meta" style="flex-wrap: wrap; gap: 8px 16px;">
+            <div class="form-meta desktop-only" style="flex-wrap: wrap; gap: 8px 16px;">
               <span>✓ Free 14-day trial</span>
               <span>✓ No credit card required</span>
               <span>• <a href="/conversable.apk" download style="color: var(--color-text-primary); font-weight: 600; text-decoration: underline;">Download Android APK</a></span>
+            </div>
+            <div class="form-meta-mobile mobile-only">
+              Free 14-day trial. No credit card.
             </div>
           </form>
         </div>
@@ -85,7 +91,8 @@
                     <div class="partner-title">Lead Investor, Venture Partners</div>
                   </div>
                 </div>
-                <div class="scenario-tag">Scenario: Raising Seed Round</div>
+                <div class="scenario-tag desktop-only">Scenario: Raising Seed Round</div>
+                <div class="scenario-tag mobile-only">Raising Seed Round</div>
               </div>
               <div class="card-body">
                 <div class="chat-message partner">
@@ -196,7 +203,7 @@
                   <p class="simulator-partner-title" id="sim-partner-title">VP of Operations</p>
                 </div>
               </div>
-              <span class="status-indicator">Live Simulation</span>
+              <span class="status-indicator">Live simulation</span>
             </div>
 
             <div class="panel-body" id="chat-messages-container">
@@ -342,28 +349,32 @@
               <i class="lucide-icon" data-lucide="brain"></i>
             </div>
             <h3>AI Communication Coach</h3>
-            <p>Practice conversations with intelligent AI roleplay partners that adapt dynamically to your tone and responses.</p>
+            <p class="desktop-only">Practice conversations with intelligent AI roleplay partners that adapt dynamically to your tone and responses.</p>
+            <p class="mobile-only">Practice with AI partners that adapt to your tone.</p>
           </div>
           <div class="why-works-card">
             <div class="card-icon-container">
               <i class="lucide-icon" data-lucide="message-circle"></i>
             </div>
             <h3>Realistic Scenarios</h3>
-            <p>Train for interviews, dating, networking, negotiations and difficult conversations curated by specialists.</p>
+            <p class="desktop-only">Train for interviews, dating, networking, negotiations and difficult conversations curated by specialists.</p>
+            <p class="mobile-only">Train for interviews, dates, negotiations, and more.</p>
           </div>
           <div class="why-works-card">
             <div class="card-icon-container">
               <i class="lucide-icon" data-lucide="bar-chart-3"></i>
             </div>
             <h3>Instant Feedback</h3>
-            <p>Receive communication scores and detailed coaching feedback after every single session you complete.</p>
+            <p class="desktop-only">Receive communication scores and detailed coaching feedback after every single session you complete.</p>
+            <p class="mobile-only">Get coaching scores after every session.</p>
           </div>
           <div class="why-works-card">
             <div class="card-icon-container">
               <i class="lucide-icon" data-lucide="fingerprint"></i>
             </div>
             <h3>Communication DNA</h3>
-            <p>Discover your strengths, weaknesses, archetypes, and speaking patterns with detailed visual breakdowns.</p>
+            <p class="desktop-only">Discover your strengths, weaknesses, archetypes, and speaking patterns with detailed visual breakdowns.</p>
+            <p class="mobile-only">Map your speaking style across empathy, clarity, and confidence.</p>
           </div>
           <div class="why-works-card">
             <div class="card-icon-container">
@@ -377,7 +388,8 @@
               <i class="lucide-icon" data-lucide="trending-up"></i>
             </div>
             <h3>Track Improvement</h3>
-            <p>Watch your confidence and communication indicators improve over time with historical progress mapping.</p>
+            <p class="desktop-only">Watch your confidence and communication indicators improve over time with historical progress mapping.</p>
+            <p class="mobile-only">Watch your skills improve with session history.</p>
           </div>
         </div>
       </div>
@@ -423,10 +435,16 @@
               <i class="lucide-icon" data-lucide="clock"></i>
             </div>
             <h3 class="feature-title">Bite-Sized Deliberate Habit</h3>
-            <p class="feature-text">
+            <p class="feature-text desktop-only">
               No long courses. Take 5 minutes a day to handle a single high-stakes scenario. Watch your emotional regulation metrics compound over months.
             </p>
+            <p class="feature-text mobile-only">
+              5 minutes a day. Real improvement over weeks.
+            </p>
           </div>
+        </div>
+        <div class="see-all-features-link mobile-only">
+          <a href="#features">See all features →</a>
         </div>
 
         <!-- Custom Interactive Component: Progress Dashboard Mockup -->
@@ -440,15 +458,29 @@
           <div class="mockup-body">
             <div class="mockup-grid">
               <div class="mockup-column stats-col">
-                <div class="stat-group">
-                  <div class="stat-label">Daily Streak</div>
-                  <div class="stat-value">18 Days</div>
-                  <div class="stat-trend text-muted">Top 4% globally</div>
+                <div class="stat-group-desktop desktop-only">
+                  <div class="stat-group">
+                    <div class="stat-label">Daily Streak</div>
+                    <div class="stat-value">18 Days</div>
+                    <div class="stat-trend text-muted">Top 4% globally</div>
+                  </div>
+                  <div class="stat-group">
+                    <div class="stat-label">Communication Style Archetype</div>
+                    <div class="stat-value">Collaborative Architect</div>
+                    <div class="stat-trend text-muted">Balanced diplomatically</div>
+                  </div>
                 </div>
-                <div class="stat-group">
-                  <div class="stat-label">Communication Style Archetype</div>
-                  <div class="stat-value">Collaborative Architect</div>
-                  <div class="stat-trend text-muted">Balanced diplomatically</div>
+                <div class="stat-group-mobile mobile-only">
+                  <div class="mobile-stat-item">
+                    <div class="mobile-stat-label">DAILY STREAK</div>
+                    <div class="mobile-stat-value">18 Days</div>
+                    <div class="mobile-stat-subtext">Top 4% globally</div>
+                  </div>
+                  <div class="mobile-stat-item">
+                    <div class="mobile-stat-label">COMMUNICATION STYLE</div>
+                    <div class="mobile-stat-value">Collaborative</div>
+                    <div class="mobile-stat-subtext">Balanced diplomatically</div>
+                  </div>
                 </div>
               </div>
               <div class="mockup-column chart-col">
@@ -567,7 +599,7 @@
           </div>
 
           <!-- Tier 3 -->
-          <div class="pricing-card">
+          <div class="pricing-card mastery-card">
             <div class="card-inner-top">
               <h3 class="tier-name">Mastery</h3>
               <p class="tier-desc">For executives & scaleup founders.</p>
@@ -591,6 +623,9 @@
             </div>
           </div>
         </div>
+        <div class="enterprise-link-container mobile-only">
+          <a href="#signup-section" class="enterprise-link">Enterprise & team plans →</a>
+        </div>
       </div>
     </section>
 
@@ -599,9 +634,13 @@
       <div class="container">
         <div class="signup-banner-card">
           <div class="tag-label text-center">Get Early Access</div>
-          <h2 class="banner-title text-center">Ready to master your social reflexes?</h2>
-          <p class="banner-desc text-center">
+          <h2 class="banner-title text-center desktop-only">Ready to master your social reflexes?</h2>
+          <h2 class="banner-title text-left mobile-only">Ready to level up?</h2>
+          <p class="banner-desc text-center desktop-only">
             Sign up today to start your 14-day trial. Learn to deal with negotiation, conflict, and persuasion without the anxiety.
+          </p>
+          <p class="banner-desc text-left mobile-only">
+            Start your 14-day free trial. No card needed.
           </p>
           
           <form class="banner-signup-form" id="footer-signup-form" onsubmit="event.preventDefault(); handleSignup(this);">
@@ -628,42 +667,68 @@
 
   <!-- Footer -->
   <footer class="footer-section">
-    <div class="container footer-grid">
-      <div class="footer-brand">
-        <a href="#" class="logo">conversable<span>.</span></a>
-        <p class="footer-tagline">Minimalist deliberate social learning. Inspired by Nordic and Japanese design philosophies.</p>
+    <div class="footer-desktop-wrapper desktop-only">
+      <div class="container footer-grid">
+        <div class="footer-brand">
+          <a href="#" class="logo">conversable<span>.</span></a>
+          <p class="footer-tagline">Minimalist deliberate social learning. Inspired by Nordic and Japanese design philosophies.</p>
+        </div>
+        <div class="footer-links-col">
+          <h4>Product</h4>
+          <a href="#why-it-works">Why It Works</a>
+          <a href="#playground">Interactive Simulator</a>
+          <a href="#features">Features</a>
+          <a href="#pricing">Pricing</a>
+        </div>
+        <div class="footer-links-col">
+          <h4>Legal</h4>
+          <a href="legal.html#privacy">Privacy Policy</a>
+          <a href="legal.html#terms">Terms of Service</a>
+          <a href="legal.html#cookies">Cookie Policy</a>
+          <a href="legal.html#refund">Refund Policy</a>
+          <a href="legal.html#community">Community Guidelines</a>
+          <a href="legal.html#ai">AI Usage Policy</a>
+          <a href="legal.html#deletion">Data Deletion</a>
+          <a href="legal.html#security">Security Policy</a>
+          <a href="legal.html#accessibility">Accessibility Statement</a>
+          <a href="legal.html#contact">Contact & Legal</a>
+        </div>
+        <div class="footer-links-col">
+          <h4>Connect</h4>
+          <a href="#">Twitter</a>
+          <a href="#">LinkedIn</a>
+          <a href="#">Contact Us</a>
+        </div>
       </div>
-      <div class="footer-links-col">
-        <h4>Product</h4>
-        <a href="#why-it-works">Why It Works</a>
-        <a href="#playground">Interactive Simulator</a>
-        <a href="#features">Features</a>
-        <a href="#pricing">Pricing</a>
-      </div>
-      <div class="footer-links-col">
-        <h4>Legal</h4>
-        <a href="legal.html#privacy">Privacy Policy</a>
-        <a href="legal.html#terms">Terms of Service</a>
-        <a href="legal.html#cookies">Cookie Policy</a>
-        <a href="legal.html#refund">Refund Policy</a>
-        <a href="legal.html#community">Community Guidelines</a>
-        <a href="legal.html#ai">AI Usage Policy</a>
-        <a href="legal.html#deletion">Data Deletion</a>
-        <a href="legal.html#security">Security Policy</a>
-        <a href="legal.html#accessibility">Accessibility Statement</a>
-        <a href="legal.html#contact">Contact & Legal</a>
-      </div>
-      <div class="footer-links-col">
-        <h4>Connect</h4>
-        <a href="#">Twitter</a>
-        <a href="#">LinkedIn</a>
-        <a href="#">Contact Us</a>
+      <div class="container footer-bottom">
+        <p>&copy; 2026 Conversable Inc. All rights reserved. Designed in Sweden & Tokyo.</p>
       </div>
     </div>
-    <div class="container footer-bottom">
-      <p>&copy; 2026 Conversable Inc. All rights reserved. Designed in Sweden & Tokyo.</p>
+
+    <!-- Mobile Footer -->
+    <div class="footer-mobile-wrapper mobile-only">
+      <div class="footer-mobile-brand">
+        <a href="#" class="footer-mobile-logo">conversable<span>.</span></a>
+        <p class="footer-mobile-tagline">Practice before it matters.</p>
+      </div>
+      <div class="footer-mobile-links">
+        <a href="legal.html#privacy">Privacy Policy</a>
+        <span class="footer-mobile-separator">·</span>
+        <a href="legal.html#terms">Terms</a>
+        <span class="footer-mobile-separator">·</span>
+        <a href="legal.html#contact">Contact</a>
+      </div>
+      <div class="footer-mobile-bottom">
+        <p>© 2026 Conversable. All rights reserved.</p>
+      </div>
     </div>
   </footer>
+
+  <!-- Sticky CTA Bar at bottom -->
+  <div id="sticky-cta-bar" class="mobile-only">
+    <button class="btn-sticky-ghost" onclick="document.getElementById('pricing').scrollIntoView({ behavior: 'smooth' });">See pricing</button>
+    <button class="btn-sticky-primary" onclick="document.getElementById('signup-section').scrollIntoView({ behavior: 'smooth' });">Start free</button>
+  </div>
 
   <!-- Lucide Icon Library -->
   <script src="lucide.min.js"></script>

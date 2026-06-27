@@ -345,4 +345,21 @@ window.addEventListener('DOMContentLoaded', () => {
     lucide.createIcons();
   }
   resetSimulator();
+
+  // Sticky CTA Bar scroll behavior
+  const heroSignupForm = document.getElementById('hero-signup-form');
+  const stickyCtaBar = document.getElementById('sticky-cta-bar');
+  if (heroSignupForm && stickyCtaBar) {
+    const handleScroll = () => {
+      const rect = heroSignupForm.getBoundingClientRect();
+      if (rect.bottom < 0) {
+        stickyCtaBar.classList.remove('visible');
+      } else {
+        stickyCtaBar.classList.add('visible');
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('resize', handleScroll);
+    handleScroll();
+  }
 });
