@@ -5,7 +5,7 @@ export default defineConfig({
   server: {
     headers: {
       'Strict-Transport-Security': 'max-age=63072000; includeSubDomains; preload',
-      'Content-Security-Policy': "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://api.yourdomain.com; frame-ancestors 'none'; form-action 'self'",
+      'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://api.yourdomain.com; frame-ancestors 'none'; form-action 'self'",
       'X-Content-Type-Options': 'nosniff',
       'X-Frame-Options': 'DENY',
       'X-XSS-Protection': '1; mode=block',
@@ -17,7 +17,7 @@ export default defineConfig({
   preview: {
     headers: {
       'Strict-Transport-Security': 'max-age=63072000; includeSubDomains; preload',
-      'Content-Security-Policy': "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://api.yourdomain.com; frame-ancestors 'none'; form-action 'self'",
+      'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://api.yourdomain.com; frame-ancestors 'none'; form-action 'self'",
       'X-Content-Type-Options': 'nosniff',
       'X-Frame-Options': 'DENY',
       'X-XSS-Protection': '1; mode=block',

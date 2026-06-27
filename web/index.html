@@ -27,7 +27,7 @@
   <!-- Header / Navigation -->
   <header class="header">
     <div class="container navbar">
-      <a href="#" class="logo" id="nav-logo" style="display: flex; align-items: center;">
+      <a href="index.html" class="logo" id="nav-logo" style="display: flex; align-items: center;">
         <img src="/logo1.png" alt="conversable." style="height: 64px; width: auto; object-fit: contain;">
       </a>
       <nav class="nav-links" aria-label="Main Navigation">
@@ -38,7 +38,7 @@
       </nav>
       <div class="nav-cta" style="display: flex; gap: 8px;">
         <a href="#signup-section" class="btn btn-primary" id="header-cta-btn">Get Started</a>
-        <a href="/conversable.apk" download class="btn btn-secondary" style="padding: 10px 16px; font-size: 14px;" id="header-download-btn">Download APK</a>
+        <a href="/conversable.apk" download class="btn btn-secondary" id="header-download-btn" onclick="handleApkDownload(event, this)">Download APK</a>
       </div>
     </div>
   </header>
@@ -60,17 +60,17 @@
           
           <!-- Hero Signup Form -->
           <form class="signup-form" id="hero-signup-form" onsubmit="event.preventDefault(); handleSignup(this);">
-            <div class="form-group">
+            <div class="form-row">
               <input type="email" placeholder="Enter your work email" required class="form-input" id="hero-email-input" aria-label="Email Address">
               <button type="submit" class="btn btn-primary btn-submit" id="hero-submit-btn">
                 <span>Start Training Free</span>
                 <i class="btn-arrow-icon" data-lucide="arrow-right"></i>
               </button>
             </div>
-            <div class="form-meta desktop-only" style="flex-wrap: wrap; gap: 8px 16px;">
+            <div class="form-meta desktop-only" style="display: flex; flex-wrap: wrap; gap: 8px 16px;">
               <span>✓ Free 14-day trial</span>
               <span>✓ No credit card required</span>
-              <span>• <a href="/conversable.apk" download style="color: var(--color-text-primary); font-weight: 600; text-decoration: underline;">Download Android APK</a></span>
+              <span>• <a href="/conversable.apk" download style="color: var(--color-text-primary); font-weight: 600; text-decoration: underline;" onclick="handleApkDownload(event, this)">Download Android APK</a></span>
             </div>
             <div class="form-meta-mobile mobile-only">
               Free 14-day trial. No credit card.
@@ -83,7 +83,7 @@
           <div class="apk-top-label">ANDROID APP</div>
           <h3 class="apk-title">Download Conversable</h3>
           <p class="apk-subtitle">Full app with voice mode & AI coaching</p>
-          <a href="/conversable.apk" download class="btn btn-primary apk-btn">
+          <a href="/conversable.apk" download class="btn btn-primary apk-btn" onclick="handleApkDownload(event, this)">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="#1A1A2E">
               <path d="M17.523 15.341a.738.738 0 0 1-.735.74.738.738 0 0 1-.735-.74V10.6a.738.738 0 0 1 .735-.74c.406 0 .735.33.735.74v4.741zm-10.046 0a.738.738 0 0 1-.735.74.738.738 0 0 1-.735-.74V10.6a.738.738 0 0 1 .735-.74c.406 0 .735.33.735.74v4.741zM15.863 5.85l.98-1.79a.2.2 0 0 0-.076-.272.2.2 0 0 0-.272.076l-.992 1.814A6.14 6.14 0 0 0 12 5.1a6.14 6.14 0 0 0-3.503 1.078L7.505 4.364a.2.2 0 0 0-.272-.076.2.2 0 0 0-.076.272l.98 1.79C6.61 7.14 5.73 8.7 5.73 10.46v.046h12.54v-.046c0-1.76-.88-3.32-2.407-4.61zM9.5 8.97a.5.5 0 0 1-.5-.5.5.5 0 0 1 .5-.5.5.5 0 0 1 .5.5.5.5 0 0 1-.5.5zm5 0a.5.5 0 0 1-.5-.5.5.5 0 0 1 .5-.5.5.5 0 0 1 .5.5.5.5 0 0 1-.5.5zM5.73 17.52c0 .685.56 1.24 1.248 1.24h.87v2.5c0 .407.33.74.735.74.406 0 .735-.333.735-.74v-2.5h1.364v2.5c0 .407.33.74.736.74.405 0 .735-.333.735-.74v-2.5h.87c.688 0 1.247-.555 1.247-1.24v-7.014H5.73V17.52z"/>
             </svg>
@@ -668,10 +668,12 @@
           </p>
           
           <form class="banner-signup-form" id="footer-signup-form" onsubmit="event.preventDefault(); handleSignup(this);">
-            <input type="email" placeholder="Your work email" required class="form-input" id="footer-email-input" aria-label="Email Address">
-            <button type="submit" class="btn btn-primary btn-submit">
-              <span>Sign Up Now</span>
-            </button>
+            <div class="form-row">
+              <input type="email" placeholder="Your work email" required class="form-input" id="footer-email-input" aria-label="Email Address">
+              <button type="submit" class="btn btn-primary btn-submit">
+                <span>Sign Up Now</span>
+              </button>
+            </div>
           </form>
           
           <!-- Success Notification Widget (Hidden by default) -->
@@ -691,70 +693,32 @@
 
   <!-- Footer -->
   <footer class="footer-section">
-    <div class="footer-desktop-wrapper desktop-only">
-      <div class="container footer-grid">
-        <div class="footer-brand">
-          <a href="#" class="logo" style="display: flex; align-items: center;">
-            <img src="/logo1.png" alt="conversable." style="height: 64px; width: auto; object-fit: contain;">
-          </a>
-          <p class="footer-tagline">Minimalist deliberate social learning. Inspired by Nordic and Japanese design philosophies.</p>
-        </div>
-        <div class="footer-links-col">
-          <h4>Product</h4>
-          <a href="#why-it-works">Why It Works</a>
-          <a href="#playground">Interactive Simulator</a>
-          <a href="#features">Features</a>
-          <a href="#pricing">Pricing</a>
-        </div>
-        <div class="footer-links-col">
-          <h4>Legal</h4>
-          <a href="legal.html#privacy">Privacy Policy</a>
-          <a href="legal.html#terms">Terms of Service</a>
-          <a href="legal.html#cookies">Cookie Policy</a>
-          <a href="legal.html#refund">Refund Policy</a>
-          <a href="legal.html#community">Community Guidelines</a>
-          <a href="legal.html#ai">AI Usage Policy</a>
-          <a href="legal.html#deletion">Data Deletion</a>
-          <a href="legal.html#security">Security Policy</a>
-          <a href="legal.html#accessibility">Accessibility Statement</a>
-          <a href="legal.html#contact">Contact & Legal</a>
-        </div>
-        <div class="footer-links-col">
-          <h4>Connect</h4>
-          <a href="#">Twitter</a>
-          <a href="#">LinkedIn</a>
-          <a href="#">Contact Us</a>
-        </div>
-      </div>
-      <div class="container footer-bottom">
-        <p>&copy; 2026 Conversable Inc. All rights reserved. Designed in Sweden & Tokyo.</p>
-      </div>
-    </div>
-
-    <!-- Mobile Footer -->
-    <div class="footer-mobile-wrapper mobile-only">
-      <div class="footer-mobile-brand">
-        <a href="#" class="footer-mobile-logo" style="display: flex; align-items: center; justify-content: center;">
-          <img src="/logo1.png" alt="conversable." style="height: 56px; width: auto; object-fit: contain;">
-        </a>
-        <p class="footer-mobile-tagline">Practice before it matters.</p>
-      </div>
-      <div class="footer-mobile-links">
+    <div class="container footer-wrapper">
+      <!-- Logo -->
+      <a href="index.html" class="footer-logo">
+        <img src="/logo1.png" alt="conversable.">
+      </a>
+      <!-- Tagline -->
+      <p class="footer-tagline">Minimalist deliberate social learning. Inspired by Nordic and Japanese design philosophies.</p>
+      <!-- Navigation Links -->
+      <div class="footer-links">
+        <a href="index.html#why-it-works">Why It Works</a>
+        <a href="index.html#features">Features</a>
+        <a href="index.html#pricing">Pricing</a>
         <a href="legal.html#privacy">Privacy Policy</a>
-        <span class="footer-mobile-separator">·</span>
-        <a href="legal.html#terms">Terms</a>
-        <span class="footer-mobile-separator">·</span>
+        <a href="legal.html#terms">Terms of Service</a>
         <a href="legal.html#contact">Contact</a>
       </div>
-      <div class="footer-mobile-bottom">
-        <p>© 2026 Conversable. All rights reserved.</p>
+      <!-- Copyright -->
+      <div class="footer-copyright">
+        <p>&copy; 2026 Conversable. Designed in Sweden & Tokyo.</p>
       </div>
     </div>
   </footer>
 
   <!-- Sticky CTA Bar at bottom -->
   <div id="sticky-cta-bar" class="mobile-only">
-    <button class="btn-sticky-apk" onclick="showDownloadToast(event)">
+    <button class="btn-sticky-apk" onclick="handleApkDownload(event, this)">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
         <polyline points="7 10 12 15 17 10"/>

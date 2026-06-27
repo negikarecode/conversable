@@ -378,18 +378,80 @@ function handleSignup(formElement) {
   }, 1200);
 }
 
-// APK Download Toast
-function showDownloadToast(event) {
+// APK Download Handler (with loading state and error handling)
+function handleApkDownload(event, buttonElement) {
   if (event) event.preventDefault();
+  
+  if (!buttonElement) return;
+  if (buttonElement.classList.contains('loading')) return;
+  
+  // Save original styles/text
+  const originalText = buttonElement.innerHTML;
+  buttonElement.classList.add('loading');
+  buttonElement.style.pointerEvents = 'none';
+  
+  // Set loading text / state
+  const isButton = buttonElement.tagName === 'BUTTON' || buttonElement.classList.contains('btn') || buttonElement.classList.contains('btn-sticky-apk');
+  const textSpan = buttonElement.querySelector('span') || buttonElement;
+  
+  let prevText = textSpan ? textSpan.textContent : '';
+  if (isButton && textSpan) {
+    textSpan.textContent = 'Preparing...';
+  }
+  
+  // Perform HEAD request to check availability & handle errors
+  fetch('/conversable.apk', { method: 'HEAD' })
+    .then(response => {
+      if (response.ok) {
+        if (isButton && textSpan) {
+          textSpan.textContent = 'Downloading...';
+        }
+        
+        // Trigger file download
+        const a = document.createElement('a');
+        a.href = '/conversable.apk';
+        a.download = 'conversable.apk';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        
+        setTimeout(() => {
+          buttonElement.classList.remove('loading');
+          buttonElement.style.pointerEvents = 'auto';
+          if (isButton && textSpan) {
+            textSpan.textContent = prevText;
+          } else {
+            buttonElement.innerHTML = originalText;
+          }
+          showToast('Download started successfully!');
+        }, 1500);
+      } else {
+        throw new Error('APK file not found on the server.');
+      }
+    })
+    .catch(error => {
+      console.error('Download failed:', error);
+      buttonElement.classList.remove('loading');
+      buttonElement.style.pointerEvents = 'auto';
+      if (isButton && textSpan) {
+        textSpan.textContent = prevText;
+      } else {
+        buttonElement.innerHTML = originalText;
+      }
+      showToast('Error: Failed to fetch APK. Please try again later.');
+    });
+}
+
+// Custom Toast notification helper
+function showToast(message) {
   let toast = document.getElementById('apk-toast');
   if (!toast) {
     toast = document.createElement('div');
     toast.id = 'apk-toast';
-    toast.textContent = "APK coming soon! Join the waitlist above.";
     document.body.appendChild(toast);
   }
-  // Trigger reflow
-  toast.offsetHeight;
+  toast.textContent = message;
+  toast.offsetHeight; // trigger layout reflow
   toast.classList.add('show');
   
   if (window.toastTimeout) {
@@ -446,4 +508,5 @@ window.selectScenario = selectScenario;
 window.resetSimulator = resetSimulator;
 window.chooseOption = chooseOption;
 window.handleSignup = handleSignup;
-window.showDownloadToast = showDownloadToast;
+window.handleApkDownload = handleApkDownload;
+window.showToast = showToast;
