@@ -2701,6 +2701,11 @@ span.desktop-only, a.desktop-only {
     display: none !important;
   }
   
+  .stats-panel.show {
+    display: block !important;
+    margin-top: 16px !important;
+  }
+  
   .chat-panel {
     min-height: unset !important;
   }

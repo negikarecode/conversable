@@ -223,6 +223,10 @@ function resetSimulator() {
   document.getElementById('opt-3-text').textContent = data.options[2].text;
 
   // Reset Stats View
+  const statsPanel = document.querySelector('.stats-panel');
+  if (statsPanel) {
+    statsPanel.classList.remove('show');
+  }
   document.getElementById('empty-stats-view').style.display = 'flex';
   document.getElementById('active-stats-view').style.display = 'none';
 
@@ -263,8 +267,17 @@ function chooseOption(index) {
     typing.style.display = 'none';
 
     // Show Stats Panel
+    const statsPanel = document.querySelector('.stats-panel');
+    if (statsPanel) {
+      statsPanel.classList.add('show');
+    }
     document.getElementById('empty-stats-view').style.display = 'none';
     document.getElementById('active-stats-view').style.display = 'block';
+
+    // Smooth scroll to stats panel on mobile
+    if (window.innerWidth <= 768 && statsPanel) {
+      statsPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
 
     // Set DNA scores with animation delay
     setTimeout(() => {
