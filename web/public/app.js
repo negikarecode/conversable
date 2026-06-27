@@ -222,6 +222,16 @@ function resetSimulator() {
   document.getElementById('opt-2-text').textContent = data.options[1].text;
   document.getElementById('opt-3-text').textContent = data.options[2].text;
 
+  // Reset option button highlights
+  const buttons = document.querySelectorAll('.option-btn');
+  buttons.forEach(btn => {
+    btn.classList.remove('selected', 'disabled');
+    btn.style.opacity = '1';
+    btn.style.pointerEvents = 'auto';
+    btn.style.borderColor = '';
+    btn.style.backgroundColor = '';
+  });
+
   // Reset Stats View
   const statsPanel = document.querySelector('.stats-panel');
   if (statsPanel) {
@@ -245,14 +255,25 @@ function chooseOption(index) {
   const data = simulatorData[currentScenario];
   const choice = data.options[optionIndex];
 
+  // Highlight selected option and disable others
+  const buttons = document.querySelectorAll('.option-btn');
+  buttons.forEach((btn, idx) => {
+    if (idx === optionIndex) {
+      btn.classList.add('selected');
+      btn.style.borderColor = 'var(--primary)';
+      btn.style.backgroundColor = 'var(--surface-alt)';
+    } else {
+      btn.classList.add('disabled');
+      btn.style.opacity = '0.4';
+      btn.style.pointerEvents = 'none';
+    }
+  });
+
   // Show User Message
   const userMsgContainer = document.getElementById('sim-user-message');
   const userMsgText = document.getElementById('sim-user-text');
   userMsgText.textContent = choice.text;
   userMsgContainer.style.display = 'block';
-
-  // Hide Options
-  document.getElementById('sim-options-container').style.display = 'none';
 
   // Show Typing Indicator
   const typing = document.getElementById('sim-typing');
@@ -262,22 +283,35 @@ function chooseOption(index) {
   const chatContainer = document.getElementById('chat-messages-container');
   chatContainer.scrollTop = chatContainer.scrollHeight;
 
+  // Immediately display style analysis panel in loading/analyzing state
+  const statsPanel = document.querySelector('.stats-panel');
+  if (statsPanel) {
+    statsPanel.classList.add('show');
+  }
+  document.getElementById('empty-stats-view').style.display = 'none';
+  document.getElementById('active-stats-view').style.display = 'block';
+
+  // Set Tone Analysis and verdict text to "Analyzing speaking style..."
+  document.getElementById('dna-badge').textContent = "Analyzing...";
+  document.getElementById('dna-score').textContent = "--/100";
+  document.getElementById('dna-tone-val').textContent = "Calculating metrics...";
+  document.getElementById('dna-verdict-text').textContent = "AI coach is processing your response structure, assertiveness levels, and empathy anchors...";
+
+  // Reset bars to 0% for start of animation
+  document.getElementById('dna-confidence-bar').style.width = '0%';
+  document.getElementById('dna-confidence-val').textContent = '0%';
+  document.getElementById('dna-empathy-bar').style.width = '0%';
+  document.getElementById('dna-empathy-val').textContent = '0%';
+  document.getElementById('dna-clarity-bar').style.width = '0%';
+  document.getElementById('dna-clarity-val').textContent = '0%';
+
+  // Empty improvements list with placeholder loading state
+  const improvementsList = document.getElementById('dna-improvements-list');
+  improvementsList.innerHTML = '<li>Analyzing speech DNA...</li>';
+
   setTimeout(() => {
     // Hide Typing Indicator
     typing.style.display = 'none';
-
-    // Show Stats Panel
-    const statsPanel = document.querySelector('.stats-panel');
-    if (statsPanel) {
-      statsPanel.classList.add('show');
-    }
-    document.getElementById('empty-stats-view').style.display = 'none';
-    document.getElementById('active-stats-view').style.display = 'block';
-
-    // Smooth scroll to stats panel on mobile
-    if (window.innerWidth <= 768 && statsPanel) {
-      statsPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
 
     // Set DNA scores with animation delay
     setTimeout(() => {
@@ -298,7 +332,6 @@ function chooseOption(index) {
     document.getElementById('dna-verdict-text').textContent = choice.verdict;
 
     // Load Suggested Improvements List
-    const improvementsList = document.getElementById('dna-improvements-list');
     improvementsList.innerHTML = '';
     choice.improvements.forEach(imp => {
       const li = document.createElement('li');
@@ -306,12 +339,13 @@ function chooseOption(index) {
       improvementsList.appendChild(li);
     });
 
-    // Show Reset Button
+    // Swap option selector with Reset Button
+    document.getElementById('sim-options-container').style.display = 'none';
     document.getElementById('sim-reset-container').style.display = 'block';
 
     // Scroll chat again
     chatContainer.scrollTop = chatContainer.scrollHeight;
-  }, 1000);
+  }, 1200);
 }
 
 
@@ -413,3 +447,11 @@ window.addEventListener('DOMContentLoaded', () => {
     handleScroll();
   }
 });
+
+// Expose key functions globally to ensure HTML inline events work reliably
+window.triggerHeroDemo = triggerHeroDemo;
+window.selectScenario = selectScenario;
+window.resetSimulator = resetSimulator;
+window.chooseOption = chooseOption;
+window.handleSignup = handleSignup;
+window.showDownloadToast = showDownloadToast;

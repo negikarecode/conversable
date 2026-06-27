@@ -127,6 +127,11 @@ p {
   gap: var(--space-xs);
 }
 
+.btn:active {
+  transform: translateY(0) scale(0.98) !important;
+  opacity: 0.9;
+}
+
 .btn-sm {
   padding: 0.6rem 1.4rem;
   font-size: 0.85rem;
@@ -166,9 +171,15 @@ p {
 
 /* HEADER & NAVBAR */
 .header {
-  padding: var(--space-md) 0;
-  position: relative;
-  z-index: 10;
+  padding: 12px 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  transition: all 0.25s ease;
 }
 
 .navbar {
@@ -262,25 +273,30 @@ p {
   display: flex;
   gap: 12px;
   background: var(--surface);
-  padding: var(--space-xs);
-  border-radius: var(--radius-pill);
+  padding: 6px;
+  border-radius: 100px;
   border: 1px solid var(--border);
-  transition: var(--transition);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  align-items: center;
+  height: 58px;
+  box-sizing: border-box;
 }
 
 .form-group:focus-within {
   border-color: var(--border-focus);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
 }
 
 .form-input {
   flex: 1;
   border: none;
   background: transparent;
-  padding: 0.5rem 1.2rem;
+  padding: 0 20px;
   font-family: var(--font-main);
   font-size: 1rem;
   color: var(--primary);
   outline: none;
+  height: 100%;
 }
 
 .form-input::placeholder {
@@ -1497,18 +1513,35 @@ p {
   display: flex;
   gap: 12px;
   max-width: 500px;
-  margin: 0 auto;
+  margin: var(--space-md) auto 0 auto;
+  align-items: center;
+  height: 58px;
 }
 
 .banner-signup-form .form-input {
+  flex: 1;
   background: var(--surface-alt);
   border: 1px solid var(--border);
-  border-radius: var(--radius-pill);
-  padding: 0.9rem 1.6rem;
+  border-radius: 100px;
+  padding: 0 24px;
+  font-family: var(--font-main);
+  font-size: 1rem;
+  color: var(--primary);
+  outline: none;
+  height: 100%;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
 }
 
 .banner-signup-form .form-input:focus {
   border-color: var(--border-focus);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.banner-signup-form .btn-submit {
+  height: 100%;
+  border-radius: 100px;
+  padding: 0 32px;
 }
 
 /* SUCCESS STATE FOR SIGNUP */
@@ -1558,7 +1591,7 @@ p {
 .footer-section {
   background: var(--primary);
   color: var(--surface);
-  padding: var(--space-3xl) 0 var(--space-md) 0;
+  padding: 48px 0 24px 0;
   margin-top: auto;
 }
 
@@ -1566,7 +1599,7 @@ p {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1fr;
   gap: var(--space-lg);
-  margin-bottom: var(--space-2xl);
+  margin-bottom: 32px;
 }
 
 .footer-brand .logo {
@@ -2533,17 +2566,18 @@ span.desktop-only, a.desktop-only {
   
   #hero-signup-form .form-input {
     width: 100% !important;
-    height: 48px !important;
+    height: 54px !important;
     background: var(--surface) !important;
     border: 1px solid var(--border) !important;
     border-radius: 12px !important;
-    padding: 0 16px !important;
+    padding: 0 20px !important;
     margin-bottom: 8px !important;
+    font-size: 15px !important;
   }
   
   #hero-signup-form .btn-submit {
     width: 100% !important;
-    height: 48px !important;
+    height: 54px !important;
     margin-top: 0 !important;
     border-radius: 12px !important;
     padding: 0 !important;
@@ -2587,16 +2621,15 @@ span.desktop-only, a.desktop-only {
     margin-bottom: 16px !important;
   }
 
-  /* FIX 1 & PART 5 - ALL FEATURE CARDS IN 2-COLUMN GRID */
+  /* FIX 1 & PART 5 - ALL FEATURE CARDS IN GRID */
   .feature-cards-container,
   .features-grid,
-  [class*="feature"] > div,
   .cards-grid,
   .why-works-grid,
   .vision-grid {
     display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    gap: 10px !important;
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
   }
   
   .feature-card, .why-works-card, .vision-card {
@@ -2663,6 +2696,10 @@ span.desktop-only, a.desktop-only {
     font-weight: 600 !important;
     color: var(--primary) !important;
     text-decoration: none !important;
+  }
+
+  #playground {
+    display: none !important;
   }
 
   /* PART 6 - LIVE SIMULATOR SECTION */
@@ -2800,8 +2837,18 @@ span.desktop-only, a.desktop-only {
 
   /* PART 7 - PROFILE ANALYTICS DEMO */
   .dashboard-mockup-card {
-    padding: 16px !important;
+    padding: 0 !important; /* Reset padding to allow full header background */
     border-radius: 16px !important;
+    overflow: hidden !important;
+    border: 1px solid var(--primary) !important;
+  }
+  
+  .mockup-header {
+    padding: 12px 16px !important;
+  }
+  
+  .mockup-body {
+    padding: 16px !important;
   }
   
   .mockup-grid {
@@ -2815,6 +2862,7 @@ span.desktop-only, a.desktop-only {
   
   .stat-group-mobile {
     display: flex !important;
+    flex-direction: column !important;
     gap: 16px !important;
     width: 100% !important;
   }
@@ -2858,7 +2906,7 @@ span.desktop-only, a.desktop-only {
   }
   
   .pricing-card.mastery-card {
-    display: none !important;
+    display: flex !important;
   }
   
   .pricing-card .price-wrapper {
@@ -2952,10 +3000,20 @@ span.desktop-only, a.desktop-only {
 
   /* PART 10 - BOTTOM CTA SIGNUP */
   .signup-banner-card {
-    border: none !important;
-    background: transparent !important;
-    padding: 0 !important;
-    box-shadow: none !important;
+    border: 1px solid var(--border) !important;
+    background: var(--surface) !important;
+    padding: 28px 20px !important;
+    border-radius: 16px !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02) !important;
+    text-align: center !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .signup-banner-card .banner-title,
+  .signup-banner-card .banner-desc {
+    text-align: center !important;
   }
   
   .banner-signup-form {
@@ -2968,17 +3026,18 @@ span.desktop-only, a.desktop-only {
   
   .banner-signup-form .form-input {
     width: 100% !important;
-    height: 48px !important;
+    height: 54px !important;
     background: var(--surface) !important;
     border: 1px solid var(--border) !important;
     border-radius: 12px !important;
-    padding: 0 16px !important;
+    padding: 0 20px !important;
     margin: 0 !important;
+    font-size: 15px !important;
   }
   
   .banner-signup-form .btn-submit {
     width: 100% !important;
-    height: 48px !important;
+    height: 54px !important;
     border-radius: 12px !important;
     margin: 0 !important;
     padding: 0 !important;
@@ -3053,7 +3112,7 @@ span.desktop-only, a.desktop-only {
 
   /* FIX 3 - SIMULATOR DEMO SEPARATION */
   .hero-visual {
-    padding-top: 32px !important;
+    display: none !important;
   }
   
   .simulator-demo-divider {
