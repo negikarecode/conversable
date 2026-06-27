@@ -59,12 +59,12 @@ fun ScenarioMarketplaceScreen(
             MarketplaceScenarioEntity(
                 id = it.id,
                 title = it.title,
-                description = it.description,
+                description = it.scenarioDescription,
                 category = it.category,
                 difficulty = it.difficulty,
                 partnerName = it.partnerName,
                 partnerAvatar = it.partnerAvatar,
-                systemPrompt = it.systemPrompt,
+                systemPrompt = it.hiddenGoal,
                 initialMessage = it.initialMessage,
                 isBookmarked = false,
                 isPublished = true,
@@ -204,18 +204,18 @@ fun ScenarioMarketplaceScreen(
                                             viewModel.generateScenarioWithAi(aiGeneratorInput) { created ->
                                                 if (created != null) {
                                                     // Map Entity back to model Scenario
-                                                    val modelScenario = Scenario(
-                                                        id = created.id,
-                                                        title = created.title,
-                                                        description = created.description,
-                                                        category = created.category,
-                                                        difficulty = created.difficulty,
-                                                        partnerName = created.partnerName,
-                                                        partnerAvatar = created.partnerAvatar,
-                                                        systemPrompt = created.systemPrompt,
-                                                        initialMessage = created.initialMessage,
-                                                        partnerPersona = created.description
-                                                    )
+                                                     val modelScenario = Scenario(
+                                                         id = created.id,
+                                                         title = created.title,
+                                                         category = created.category,
+                                                         partnerName = created.partnerName,
+                                                         partnerAvatar = created.partnerAvatar,
+                                                         partnerPersona = created.systemPrompt,
+                                                         scenarioDescription = created.description,
+                                                         hiddenGoal = created.systemPrompt,
+                                                         difficulty = created.difficulty,
+                                                         initialMessage = created.initialMessage
+                                                     )
                                                     onStartScenario(modelScenario)
                                                 } else {
                                                     Toast.makeText(context, "Failed to generate scenario. Try again.", Toast.LENGTH_SHORT).show()
@@ -255,14 +255,14 @@ fun ScenarioMarketplaceScreen(
                                 val modelScenario = Scenario(
                                     id = scenario.id,
                                     title = scenario.title,
-                                    description = scenario.description,
                                     category = scenario.category,
-                                    difficulty = scenario.difficulty,
                                     partnerName = scenario.partnerName,
                                     partnerAvatar = scenario.partnerAvatar,
-                                    systemPrompt = scenario.systemPrompt,
-                                    initialMessage = scenario.initialMessage,
-                                    partnerPersona = scenario.description
+                                    partnerPersona = scenario.systemPrompt,
+                                    scenarioDescription = scenario.description,
+                                    hiddenGoal = scenario.systemPrompt,
+                                    difficulty = scenario.difficulty,
+                                    initialMessage = scenario.initialMessage
                                 )
                                 onStartScenario(modelScenario)
                             }
@@ -299,14 +299,14 @@ fun ScenarioMarketplaceScreen(
                                 val modelScenario = Scenario(
                                     id = scenario.id,
                                     title = scenario.title,
-                                    description = scenario.description,
                                     category = scenario.category,
-                                    difficulty = scenario.difficulty,
                                     partnerName = scenario.partnerName,
                                     partnerAvatar = scenario.partnerAvatar,
-                                    systemPrompt = scenario.systemPrompt,
-                                    initialMessage = scenario.initialMessage,
-                                    partnerPersona = scenario.description
+                                    partnerPersona = scenario.systemPrompt,
+                                    scenarioDescription = scenario.description,
+                                    hiddenGoal = scenario.systemPrompt,
+                                    difficulty = scenario.difficulty,
+                                    initialMessage = scenario.initialMessage
                                 )
                                 onStartScenario(modelScenario)
                             }

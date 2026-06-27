@@ -348,7 +348,7 @@ fun LiveCoachScreen(
                                         goal = goalInput,
                                         scenario = scenarioInput,
                                         strategy = generatedStrategy,
-                                        transcriptJson = moshi.adapter(List::class.java).toJson(messages.map { mapOf("text" to it.text, "isUser" to it.isUser) }),
+                                        transcriptJson = viewModel.moshi.adapter(List::class.java).toJson(messages.map { mapOf("text" to it.text, "isUser" to it.isUser) }),
                                         suggestionsShown = tipsCount,
                                         feedback = feedbackReport
                                     )

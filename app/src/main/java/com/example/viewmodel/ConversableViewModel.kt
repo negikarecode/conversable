@@ -273,7 +273,7 @@ class ConversableViewModel(application: Application) : AndroidViewModel(applicat
     private var textToSpeech: TextToSpeech? = null
     private var isTtsReady = false
 
-    private val moshi = Moshi.Builder()
+    val moshi = Moshi.Builder()
         .add(com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory())
         .build()
 

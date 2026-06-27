@@ -337,18 +337,18 @@ fun SpecializedHubScreen(
                                         coroutineScope.launch {
                                             viewModel.generateScenarioWithAi("$hubType - $customPrompt") { created ->
                                                 if (created != null) {
-                                                    val modelScenario = Scenario(
-                                                        id = created.id,
-                                                        title = created.title,
-                                                        description = created.description,
-                                                        category = created.category,
-                                                        difficulty = created.difficulty,
-                                                        partnerName = created.partnerName,
-                                                        partnerAvatar = created.partnerAvatar,
-                                                        systemPrompt = created.systemPrompt,
-                                                        initialMessage = created.initialMessage,
-                                                        partnerPersona = created.description
-                                                    )
+                                                     val modelScenario = Scenario(
+                                                         id = created.id,
+                                                         title = created.title,
+                                                         category = created.category,
+                                                         partnerName = created.partnerName,
+                                                         partnerAvatar = created.partnerAvatar,
+                                                         partnerPersona = created.systemPrompt,
+                                                         scenarioDescription = created.description,
+                                                         hiddenGoal = created.systemPrompt,
+                                                         difficulty = created.difficulty,
+                                                         initialMessage = created.initialMessage
+                                                     )
                                                     onStartScenario(modelScenario)
                                                 } else {
                                                     Toast.makeText(context, "Generation failed. Try again.", Toast.LENGTH_SHORT).show()

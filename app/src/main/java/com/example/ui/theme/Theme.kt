@@ -26,12 +26,12 @@ import androidx.compose.foundation.layout.padding
 
 private val DarkColorScheme =
   darkColorScheme(
-    primary = SleekPrimaryLight,
-    secondary = SleekPrimary,
+    primary = androidx.compose.ui.graphics.Color.White,
+    secondary = SleekPrimaryLight,
     tertiary = SleekSuccess,
-    background = SleekTextDark,
-    surface = SleekTextGray,
-    onPrimary = SleekTextDark,
+    background = androidx.compose.ui.graphics.Color(0xFF1A1A2E), // Premium dark navy matching website's APK banner
+    surface = androidx.compose.ui.graphics.Color(0xFF252538),     // Lighter dark surface
+    onPrimary = androidx.compose.ui.graphics.Color(0xFF1A1A2E),
     onSecondary = androidx.compose.ui.graphics.Color.White,
     onBackground = androidx.compose.ui.graphics.Color.White,
     onSurface = androidx.compose.ui.graphics.Color.White

@@ -263,7 +263,7 @@ fun VocalCameraCoachScreen(
                             val path = androidx.compose.ui.graphics.Path()
                             path.moveTo(0f, midY)
                             for (x in 0..w.toInt() step 5) {
-                                val y = midY + Math.sin((x.toFloat() * 0.05f) + voiceWavePhase).toFloat() * 15.dp.toPx()
+                                val y = midY + kotlin.math.sin((x.toFloat() * 0.05f) + voiceWavePhase) * 15.dp.toPx()
                                 path.lineTo(x.toFloat(), y)
                             }
                             drawPath(
