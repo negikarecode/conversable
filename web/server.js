@@ -167,6 +167,13 @@ const healthStates = {
   cerebras: { status: 'Unavailable', reason: 'Not verified', lastSuccess: null, lastFailure: null, avgLatency: 0, requestCount: 0, failureCount: 0 }
 };
 
+// Check if a provider has a valid key configured in process.env
+function isProviderConfigured(key) {
+  const config = PROVIDERS[key];
+  const apiKey = process.env[config.apiKeyName];
+  return apiKey && apiKey !== '' && !apiKey.includes('PLACEHOLDER') && !apiKey.includes('YOUR_') && !apiKey.includes('MY_');
+}
+
 // Update rolling latency
 function updateLatency(key, latency) {
   const state = healthStates[key];
@@ -178,17 +185,34 @@ function updateLatency(key, latency) {
   }
 }
 
+// Friendly HTTP Error Parsers
+function getFriendlyError(status, errText) {
+  if (status === 401 || status === 403) {
+    return 'Invalid API key / Authentication failed';
+  }
+  if (status === 429) {
+    return 'Rate limit exceeded';
+  }
+  if (status === 404) {
+    return 'Model not found / Incorrect endpoint';
+  }
+  if (status >= 500) {
+    return 'Provider internal server error (5xx)';
+  }
+  return `HTTP ${status}: ${errText.substring(0, 100)}`;
+}
+
 // Test Provider
 async function testProvider(key) {
   const config = PROVIDERS[key];
-  const apiKey = process.env[config.apiKeyName];
   
-  if (!apiKey || apiKey.includes('PLACEHOLDER') || apiKey.includes('YOUR_') || apiKey.includes('MY_') || apiKey === '') {
+  if (!isProviderConfigured(key)) {
     healthStates[key].status = 'Unavailable';
     healthStates[key].reason = `API Key ${config.apiKeyName} is missing or placeholder`;
     return false;
   }
 
+  const apiKey = process.env[config.apiKeyName];
   const startTime = Date.now();
   try {
     let url = config.endpoint;
@@ -234,25 +258,98 @@ async function testProvider(key) {
       }
     } else {
       const errText = await response.text().catch(() => '');
+      const friendlyErr = getFriendlyError(response.status, errText);
       healthStates[key].status = 'Unavailable';
-      healthStates[key].reason = `API returned HTTP ${response.status}: ${errText.substring(0, 100)}`;
+      healthStates[key].reason = friendlyErr;
       healthStates[key].lastFailure = new Date().toISOString();
       return false;
     }
   } catch (err) {
+    const reason = err.name === 'AbortError' ? 'Timeout' : `Network error: ${err.message}`;
     healthStates[key].status = 'Unavailable';
-    healthStates[key].reason = `Connection error: ${err.message}`;
+    healthStates[key].reason = reason;
     healthStates[key].lastFailure = new Date().toISOString();
     return false;
   }
 }
 
+// Send real test prompt to every healthy provider to verify AI response
+async function verifyRealAiResponses() {
+  console.log('\n==================================================');
+  console.log(' RUNNING REAL AI RESPONSE VERIFICATION TESTS');
+  console.log('==================================================');
+  
+  for (const key of Object.keys(PROVIDERS)) {
+    if (healthStates[key].status !== 'Healthy') {
+      console.log(`- Skipping ${PROVIDERS[key].name} (not healthy / missing key)`);
+      continue;
+    }
+    
+    console.log(`Testing real AI response from ${PROVIDERS[key].name}...`);
+    try {
+      const testMsg = [{ role: 'user', content: 'Reply with: Conversable AI is working.' }];
+      const config = PROVIDERS[key];
+      const apiKey = process.env[config.apiKeyName];
+      let url = config.endpoint;
+      const headers = { 'Content-Type': 'application/json' };
+      if (key === 'gemini') {
+        url += `?key=${apiKey}`;
+      } else {
+        headers['Authorization'] = `Bearer ${apiKey}`;
+      }
+      
+      const payload = config.formatPayload(null, testMsg, 0.1, 50);
+      const response = await fetch(url, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(payload)
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        const text = config.parseResponse(data);
+        if (text && text.toLowerCase().includes('conversable ai is working')) {
+          console.log(`✓ ${config.name} returned valid response: "${text.trim()}"`);
+        } else if (text) {
+          console.log(`⚠️ ${config.name} returned response but did not match prompt: "${text.trim()}"`);
+        } else {
+          console.log(`✗ ${config.name} returned empty text`);
+        }
+      } else {
+        console.log(`✗ ${config.name} returned HTTP ${response.status}`);
+      }
+    } catch (err) {
+      console.log(`✗ ${config.name} failed during test request: ${err.message}`);
+    }
+  }
+  console.log('==================================================\n');
+}
+
 // Startup checks
 async function runAllHealthChecks() {
-  console.log('[AI Gateway] Running startup health checks...');
+  // 1. Output Startup Configuration Report
+  console.log('==================================================');
+  console.log(' AI GATEWAY STARTUP CONFIGURATION REPORT');
+  console.log('==================================================');
+  for (const key of Object.keys(PROVIDERS)) {
+    const config = PROVIDERS[key];
+    if (isProviderConfigured(key)) {
+      console.log(`✓ ${config.name} configured`);
+    } else {
+      console.log(`✗ ${config.name} missing API key`);
+    }
+  }
+  console.log('==================================================\n');
+
+  // 2. Perform Validation Requests
+  console.log('[AI Gateway] Running startup validation health checks...');
   for (const key of Object.keys(PROVIDERS)) {
     await testProvider(key);
+    console.log(`[AI Gateway] ${PROVIDERS[key].name}: ${healthStates[key].status} (${healthStates[key].reason})`);
   }
+
+  // 3. Verify Real AI Output Responses
+  await verifyRealAiResponses();
 }
 
 // Background scheduler
