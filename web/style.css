@@ -2679,24 +2679,21 @@ span.desktop-only, a.desktop-only {
   }
   
   .header .container.navbar {
-    position: relative !important;
     display: flex !important;
     flex-direction: row !important;
-    justify-content: flex-end !important;
+    justify-content: center !important;
     align-items: center !important;
     padding: 0 !important;
     height: 100% !important;
   }
   
   .logo {
-    position: absolute !important;
-    left: 50% !important;
-    top: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    margin: 0 !important;
     display: flex !important;
     align-items: center !important;
-    z-index: 5 !important;
+    justify-content: center !important;
+    margin: 0 auto !important;
+    position: static !important;
+    transform: none !important;
   }
 
   .logo img {
@@ -2710,12 +2707,6 @@ span.desktop-only, a.desktop-only {
   }
   
   .nav-cta {
-    display: flex !important;
-    gap: 0 !important;
-    align-items: center !important;
-  }
-  
-  #header-download-btn {
     display: none !important;
   }
   
@@ -3735,6 +3726,27 @@ span.desktop-only, a.desktop-only {
 @media (max-width: 768px) {
   .scenarios-grid {
     grid-template-columns: 1fr;
+  }
+  
+  .scenario-category-card {
+    text-align: center !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    padding: var(--space-md) !important;
+  }
+  
+  .category-icon {
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+  
+  .card-bullets {
+    display: inline-flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    padding-left: 0 !important;
+    text-align: left !important;
   }
 }
 
