@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
-    <!-- Block cleartext traffic globally and enforce certificate pinning for production -->
-    <domain-config cleartextTrafficPermitted="false">
+    <!-- Allow cleartext traffic for local development loopbacks -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">127.0.0.1</domain>
+        <domain includeSubdomains="true">10.0.2.2</domain>
+    </domain-config>
+
+    <!-- Configure production domains -->
+    <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">conversable.app</domain>
         <domain includeSubdomains="true">api.conversable.app</domain>
-        <pin-set>
-            <!-- Leaf pin digest for primary server TLS certificate -->
-            <pin digest="SHA-256">klO23nT2ehFDXCxg3yCD9aoBg1tdsYfm87VWq6W8pEw=</pin>
-            <!-- Backup pin digest for certificate rotation -->
-            <pin digest="SHA-256">grX4Ta9HPghmTy5T1z556pB7aeVWq6W8pEwklO23nT2=</pin>
-        </pin-set>
     </domain-config>
 </network-security-config>
