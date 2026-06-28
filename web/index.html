@@ -728,16 +728,15 @@
 
   <!-- Sticky CTA Bar at bottom (Mobile only) -->
   <div id="sticky-cta-bar" class="mobile-only" role="complementary" aria-label="Sticky Download Actions">
-    <button class="btn-sticky-apk" onclick="handleApkDownload(event, this)" aria-label="Download APK file">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+    <button class="btn-sticky-primary" onclick="handleApkDownload(event, this)" aria-label="Download APK file">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true" style="stroke: white; margin-right: 4px; display: inline-block; vertical-align: middle;">
         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
         <polyline points="7 10 12 15 17 10"/>
         <line x1="12" y1="15" x2="12" y2="3"/>
       </svg>
       <span>Download APK</span>
     </button>
-    <button class="btn-sticky-ghost" onclick="document.getElementById('playground').scrollIntoView({ behavior: 'smooth' })">Live Demo</button>
-    <button class="btn-sticky-primary" onclick="document.getElementById('playground').scrollIntoView({ behavior: 'smooth' })">Get Started</button>
+    <button class="btn-sticky-ghost" onclick="document.getElementById('playground').scrollIntoView({ behavior: 'smooth' })">Try Live Demo</button>
   </div>
 
   <!-- Toast for APK Download feedback -->

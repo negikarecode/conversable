@@ -363,14 +363,14 @@ function chooseOption(index) {
   }, 1000);
 }
 
-// 7. APK DOWNLOAD HANDLER (with loading states & head check)
+// 7. APK DOWNLOAD HANDLER (Direct programmatic trigger)
 function handleApkDownload(event, buttonElement) {
   if (event) event.preventDefault();
   
   if (!buttonElement) return;
   if (buttonElement.classList.contains('loading')) return;
   
-  trackEvent('apk_download_attempt', { source_id: buttonElement.id || 'inline' });
+  trackEvent('apk_download_click', { source_id: buttonElement.id || 'inline' });
 
   // Save original styles/text
   const originalText = buttonElement.innerHTML;
@@ -381,51 +381,28 @@ function handleApkDownload(event, buttonElement) {
   let prevText = textSpan ? textSpan.textContent : 'Download APK';
   
   if (textSpan) {
-    textSpan.textContent = 'Preparing...';
+    textSpan.textContent = 'Downloading...';
   }
   
-  // Perform HEAD request to check availability
-  fetch('/conversable.apk', { method: 'HEAD' })
-    .then(response => {
-      if (response.ok) {
-        if (textSpan) {
-          textSpan.textContent = 'Downloading...';
-        }
-        
-        // Trigger file download
-        const a = document.createElement('a');
-        a.href = '/conversable.apk';
-        a.download = 'conversable.apk';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        
-        setTimeout(() => {
-          buttonElement.classList.remove('loading');
-          buttonElement.style.pointerEvents = 'auto';
-          if (textSpan) {
-            textSpan.textContent = prevText;
-          } else {
-            buttonElement.innerHTML = originalText;
-          }
-          showToast('Download started successfully!');
-          trackEvent('apk_download_success');
-        }, 1200);
-      } else {
-        throw new Error('APK file not found on the server.');
-      }
-    })
-    .catch(error => {
-      buttonElement.classList.remove('loading');
-      buttonElement.style.pointerEvents = 'auto';
-      if (textSpan) {
-        textSpan.textContent = prevText;
-      } else {
-        buttonElement.innerHTML = originalText;
-      }
-      showToast('Error: Failed to fetch APK. Please try again later.');
-      trackEvent('apk_download_failure', { error: error.message });
-    });
+  // Trigger direct download
+  const a = document.createElement('a');
+  a.href = '/conversable.apk';
+  a.download = 'conversable.apk';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  
+  setTimeout(() => {
+    buttonElement.classList.remove('loading');
+    buttonElement.style.pointerEvents = 'auto';
+    if (textSpan) {
+      textSpan.textContent = prevText;
+    } else {
+      buttonElement.innerHTML = originalText;
+    }
+    showToast('Download started successfully!');
+    trackEvent('apk_download_success');
+  }, 1200);
 }
 
 // 8. CUSTOM TOAST HELPER

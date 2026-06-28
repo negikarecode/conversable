@@ -2679,17 +2679,24 @@ span.desktop-only, a.desktop-only {
   }
   
   .header .container.navbar {
+    position: relative !important;
     display: flex !important;
     flex-direction: row !important;
-    justify-content: space-between !important;
+    justify-content: flex-end !important;
     align-items: center !important;
     padding: 0 !important;
     height: 100% !important;
   }
   
   .logo {
+    position: absolute !important;
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    margin: 0 !important;
     display: flex !important;
     align-items: center !important;
+    z-index: 5 !important;
   }
 
   .logo img {
@@ -2942,6 +2949,13 @@ span.desktop-only, a.desktop-only {
     gap: 0 !important;
   }
   
+  .simulator-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+  }
+  
   .stats-panel {
     display: none !important;
   }
@@ -3049,6 +3063,9 @@ span.desktop-only, a.desktop-only {
     border-radius: 16px !important;
     overflow: hidden !important;
     border: 1px solid var(--primary) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
   
   .mockup-header {
@@ -3913,6 +3930,13 @@ span.desktop-only, a.desktop-only {
 }
 
 @media (max-width: 768px) {
+  .cta-banner-card {
+    padding: var(--space-xl) var(--space-md) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
   .cta-actions {
     flex-direction: column;
     align-items: stretch;
