@@ -33,18 +33,24 @@ abstract class AppDatabase : RoomDatabase() {
 
     companion object {
         @Volatile
-        private var INSTANCE: AppDatabase? = null
+        private var INSTANCES = mutableMapOf<String, AppDatabase>()
 
-        fun getDatabase(context: Context): AppDatabase {
-            return INSTANCE ?: synchronized(this) {
+        fun getDatabase(context: Context, userKey: String = "default_user"): AppDatabase {
+            val dbKey = if (userKey.isEmpty()) "default_user" else userKey
+            return INSTANCES[dbKey] ?: synchronized(this) {
+                val dbName = if (dbKey == "default_user") {
+                    "conversable_database"
+                } else {
+                    "conversable_database_$dbKey"
+                }
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "conversable_database"
+                    dbName
                 )
                 .fallbackToDestructiveMigrationOnDowngrade()
                 .build()
-                INSTANCE = instance
+                INSTANCES[dbKey] = instance
                 instance
             }
         }

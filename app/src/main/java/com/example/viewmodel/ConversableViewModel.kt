@@ -41,6 +41,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.concurrent.TimeUnit
 import android.content.Context
+import android.content.SharedPreferences
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -173,28 +174,45 @@ sealed interface RoleplayState {
 
 class ConversableViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val repository: SessionRepository
-    val allSessions: StateFlow<List<ConversationSession>>
-    val averageScore: StateFlow<Float?>
-    val sessionCount: StateFlow<Int>
+    private var repository: SessionRepository
+    private val _allSessions = MutableStateFlow<List<ConversationSession>>(emptyList())
+    val allSessions: StateFlow<List<ConversationSession>> = _allSessions.asStateFlow()
 
-    private val personaRepository: PersonaRepository
-    val allPersonas: StateFlow<List<PersonaEntity>>
+    private val _averageScore = MutableStateFlow<Float?>(null)
+    val averageScore: StateFlow<Float?> = _averageScore.asStateFlow()
 
-    private val personaMemoryDao: com.example.data.db.PersonaMemoryDao
-    private val marketplaceScenarioDao: com.example.data.db.MarketplaceScenarioDao
-    private val analyzedChatDao: com.example.data.db.AnalyzedChatDao
-    private val liveCoachingSessionDao: com.example.data.db.LiveCoachingSessionDao
-    private val contactReminderDao: com.example.data.db.ContactReminderDao
-    private val groupMeetingSessionDao: com.example.data.db.GroupMeetingSessionDao
-    private val vocalCameraSessionDao: com.example.data.db.VocalCameraSessionDao
+    private val _sessionCount = MutableStateFlow<Int>(0)
+    val sessionCount: StateFlow<Int> = _sessionCount.asStateFlow()
 
-    val analyzedChats: StateFlow<List<com.example.data.db.AnalyzedChatEntity>>
-    val marketplaceScenarios: StateFlow<List<com.example.data.db.MarketplaceScenarioEntity>>
-    val liveCoachingSessions: StateFlow<List<com.example.data.db.LiveCoachingSessionEntity>>
-    val contactReminders: StateFlow<List<com.example.data.db.ContactReminderEntity>>
-    val groupMeetingSessions: StateFlow<List<com.example.data.db.GroupMeetingSessionEntity>>
-    val vocalCameraSessions: StateFlow<List<com.example.data.db.VocalCameraSessionEntity>>
+    private var personaRepository: PersonaRepository
+    private val _allPersonas = MutableStateFlow<List<PersonaEntity>>(emptyList())
+    val allPersonas: StateFlow<List<PersonaEntity>> = _allPersonas.asStateFlow()
+
+    private var personaMemoryDao: com.example.data.db.PersonaMemoryDao
+    private var marketplaceScenarioDao: com.example.data.db.MarketplaceScenarioDao
+    private var analyzedChatDao: com.example.data.db.AnalyzedChatDao
+    private var liveCoachingSessionDao: com.example.data.db.LiveCoachingSessionDao
+    private var contactReminderDao: com.example.data.db.ContactReminderDao
+    private var groupMeetingSessionDao: com.example.data.db.GroupMeetingSessionDao
+    private var vocalCameraSessionDao: com.example.data.db.VocalCameraSessionDao
+
+    private val _analyzedChats = MutableStateFlow<List<com.example.data.db.AnalyzedChatEntity>>(emptyList())
+    val analyzedChats: StateFlow<List<com.example.data.db.AnalyzedChatEntity>> = _analyzedChats.asStateFlow()
+
+    private val _marketplaceScenarios = MutableStateFlow<List<com.example.data.db.MarketplaceScenarioEntity>>(emptyList())
+    val marketplaceScenarios: StateFlow<List<com.example.data.db.MarketplaceScenarioEntity>> = _marketplaceScenarios.asStateFlow()
+
+    private val _liveCoachingSessions = MutableStateFlow<List<com.example.data.db.LiveCoachingSessionEntity>>(emptyList())
+    val liveCoachingSessions: StateFlow<List<com.example.data.db.LiveCoachingSessionEntity>> = _liveCoachingSessions.asStateFlow()
+
+    private val _contactReminders = MutableStateFlow<List<com.example.data.db.ContactReminderEntity>>(emptyList())
+    val contactReminders: StateFlow<List<com.example.data.db.ContactReminderEntity>> = _contactReminders.asStateFlow()
+
+    private val _groupMeetingSessions = MutableStateFlow<List<com.example.data.db.GroupMeetingSessionEntity>>(emptyList())
+    val groupMeetingSessions: StateFlow<List<com.example.data.db.GroupMeetingSessionEntity>> = _groupMeetingSessions.asStateFlow()
+
+    private val _vocalCameraSessions = MutableStateFlow<List<com.example.data.db.VocalCameraSessionEntity>>(emptyList())
+    val vocalCameraSessions: StateFlow<List<com.example.data.db.VocalCameraSessionEntity>> = _vocalCameraSessions.asStateFlow()
 
     private val _followedCreators = MutableStateFlow<Set<String>>(emptySet())
     val followedCreators: StateFlow<Set<String>> = _followedCreators.asStateFlow()
@@ -211,19 +229,19 @@ class ConversableViewModel(application: Application) : AndroidViewModel(applicat
     private val _streak = MutableStateFlow(0)
     val streak: StateFlow<Int> = _streak.asStateFlow()
 
-    private val _longestStreak = MutableStateFlow(42)
+    private val _longestStreak = MutableStateFlow(0)
     val longestStreak: StateFlow<Int> = _longestStreak.asStateFlow()
 
     private val _streakFreezesLeft = MutableStateFlow(2)
     val streakFreezesLeft: StateFlow<Int> = _streakFreezesLeft.asStateFlow()
 
-    private val _totalPracticeDays = MutableStateFlow(38)
+    private val _totalPracticeDays = MutableStateFlow(0)
     val totalPracticeDays: StateFlow<Int> = _totalPracticeDays.asStateFlow()
 
-    private val _perfectWeeks = MutableStateFlow(4)
+    private val _perfectWeeks = MutableStateFlow(0)
     val perfectWeeks: StateFlow<Int> = _perfectWeeks.asStateFlow()
 
-    private val _perfectMonths = MutableStateFlow(1)
+    private val _perfectMonths = MutableStateFlow(0)
     val perfectMonths: StateFlow<Int> = _perfectMonths.asStateFlow()
 
     private val _completedDates = MutableStateFlow<Set<String>>(emptySet())
@@ -330,18 +348,19 @@ class ConversableViewModel(application: Application) : AndroidViewModel(applicat
 
     fun awardReplayReviewXp(xpToAward: Int, badgeId: String? = null) {
         viewModelScope.launch {
+            val userKey = getActiveUserKey()
             val currentXp = _totalXp.value
             val xpAfter = currentXp + xpToAward
             
             val editor = sharedPrefs.edit()
-            editor.putInt("user_total_xp", xpAfter)
+            editor.putInt("user_total_xp_$userKey", xpAfter)
             
             if (badgeId != null) {
-                val currentBadges = sharedPrefs.getStringSet("unlocked_badges", emptySet()) ?: emptySet()
+                val currentBadges = sharedPrefs.getStringSet("unlocked_badges_$userKey", emptySet()) ?: emptySet()
                 if (!currentBadges.contains(badgeId)) {
                     val combinedBadges = currentBadges.toMutableSet()
                     combinedBadges.add(badgeId)
-                    editor.putStringSet("unlocked_badges", combinedBadges)
+                    editor.putStringSet("unlocked_badges_$userKey", combinedBadges)
                     _unlockedBadgeIds.value = combinedBadges
                     
                     if (_soundsEnabled.value) {
@@ -537,76 +556,28 @@ class ConversableViewModel(application: Application) : AndroidViewModel(applicat
         _currentDailyChallenge.value = todayChallenge
     }
 
+    private val prefListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+        if (key == "user_email") {
+            refreshProgressData()
+        }
+    }
+
     init {
-        val database = AppDatabase.getDatabase(application)
-        repository = SessionRepository(database.sessionDao())
-        personaRepository = PersonaRepository(database.personaDao())
+        val initialUserKey = getActiveUserKey()
+        val initialDatabase = AppDatabase.getDatabase(application, initialUserKey)
+        repository = SessionRepository(initialDatabase.sessionDao())
+        personaRepository = PersonaRepository(initialDatabase.personaDao())
         
-        personaMemoryDao = database.personaMemoryDao()
-        marketplaceScenarioDao = database.marketplaceScenarioDao()
-        analyzedChatDao = database.analyzedChatDao()
-        liveCoachingSessionDao = database.liveCoachingSessionDao()
-        contactReminderDao = database.contactReminderDao()
-        groupMeetingSessionDao = database.groupMeetingSessionDao()
-        vocalCameraSessionDao = database.vocalCameraSessionDao()
+        personaMemoryDao = initialDatabase.personaMemoryDao()
+        marketplaceScenarioDao = initialDatabase.marketplaceScenarioDao()
+        analyzedChatDao = initialDatabase.analyzedChatDao()
+        liveCoachingSessionDao = initialDatabase.liveCoachingSessionDao()
+        contactReminderDao = initialDatabase.contactReminderDao()
+        groupMeetingSessionDao = initialDatabase.groupMeetingSessionDao()
+        vocalCameraSessionDao = initialDatabase.vocalCameraSessionDao()
 
-        analyzedChats = analyzedChatDao.getAllAnalyzedChats().stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
-        )
-
-        marketplaceScenarios = marketplaceScenarioDao.getAllMarketplaceScenarios().stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
-        )
-
-        liveCoachingSessions = liveCoachingSessionDao.getAllSessions().stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
-        )
-
-        contactReminders = contactReminderDao.getAllContactReminders().stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
-        )
-
-        groupMeetingSessions = groupMeetingSessionDao.getAllGroupMeetingSessions().stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
-        )
-
-        vocalCameraSessions = vocalCameraSessionDao.getAllVocalCameraSessions().stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
-        )
-        
-        allPersonas = personaRepository.allPersonas.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
-        )
-        
-        allSessions = repository.allSessions.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
-        )
-        averageScore = repository.averageScore.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = null
-        )
-        sessionCount = repository.sessionCount.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = 0
-        )
+        // Register pref listener and initial load
+        sharedPrefs.registerOnSharedPreferenceChangeListener(prefListener)
         refreshProgressData()
 
         // Initialize TextToSpeech
@@ -619,18 +590,6 @@ class ConversableViewModel(application: Application) : AndroidViewModel(applicat
         _savedSessions.value = loadSavedSessionsFromLocalStorage()
         loadSavedLessons()
 
-        val todayStr = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(java.util.Date())
-        val lastSavedDate = sharedPrefs.getString("completed_today_date", "") ?: ""
-        if (lastSavedDate == todayStr) {
-            _scenariosCompletedToday.value = sharedPrefs.getStringSet("completed_scenarios_today", emptySet()) ?: emptySet()
-        } else {
-            _scenariosCompletedToday.value = emptySet()
-            sharedPrefs.edit()
-                .putString("completed_today_date", todayStr)
-                .putStringSet("completed_scenarios_today", emptySet())
-                .apply()
-        }
-
         // Initialize Daily Challenges
         _completedDailyChallenges.value = loadCompletedDailyChallenges()
         viewModelScope.launch {
@@ -638,6 +597,7 @@ class ConversableViewModel(application: Application) : AndroidViewModel(applicat
                 refreshDailyChallenge()
             }
         }
+        
     }
 
     fun setSoundsEnabled(enabled: Boolean) {
@@ -2841,44 +2801,178 @@ class ConversableViewModel(application: Application) : AndroidViewModel(applicat
         )
     }
 
-    fun refreshProgressData() {
-        val sharedPrefs = getApplication<Application>().getSharedPreferences("conversable_prefs", Context.MODE_PRIVATE)
-        
-        // Seed high-fidelity habit data if not already set
-        if (!sharedPrefs.contains("user_streak")) {
-            val dates = mutableSetOf<String>()
-            val sdf = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
-            val cal = java.util.Calendar.getInstance()
-            // Seed past practice days: past 35 days except days -3, -10 and -18 (missed days)
-            for (i in 1..35) {
-                if (i != 3 && i != 10 && i != 18) {
-                    cal.time = java.util.Date()
-                    cal.add(java.util.Calendar.DAY_OF_YEAR, -i)
-                    dates.add(sdf.format(cal.time))
-                }
+    private fun getActiveUserKey(): String {
+        val rawEmail = sharedPrefs.getString("user_email", "") ?: ""
+        return if (rawEmail.isNotEmpty()) {
+            val decrypted = try {
+                com.example.security.CryptoHelper.decrypt(rawEmail)
+            } catch (e: Exception) {
+                null
             }
+            val email = decrypted ?: rawEmail
+            email.lowercase().replace(".", "_")
+        } else {
+            "default_user"
+        }
+    }
+
+    private var dbJob: kotlinx.coroutines.Job? = null
+
+    fun refreshProgressData() {
+        val userKey = getActiveUserKey()
+        val scopedStreakKey = "user_streak_$userKey"
+        
+        // 1. Migrate global keys to user-scoped keys if scoped key does not exist yet
+        if (!sharedPrefs.contains(scopedStreakKey)) {
+            val editor = sharedPrefs.edit()
+            if (sharedPrefs.contains("user_streak")) {
+                // Migrate existing user's global data to their user-scoped keys
+                editor.putInt("user_total_xp_$userKey", sharedPrefs.getInt("user_total_xp", 0))
+                editor.putInt("user_streak_$userKey", sharedPrefs.getInt("user_streak", 0))
+                editor.putInt("user_longest_streak_$userKey", sharedPrefs.getInt("user_longest_streak", 0))
+                editor.putInt("streak_freezes_left_$userKey", sharedPrefs.getInt("streak_freezes_left", 2))
+                editor.putInt("total_practice_days_$userKey", sharedPrefs.getInt("total_practice_days", 0))
+                editor.putInt("perfect_weeks_$userKey", sharedPrefs.getInt("perfect_weeks", 0))
+                editor.putInt("perfect_months_$userKey", sharedPrefs.getInt("perfect_months", 0))
+                
+                val completedDates = sharedPrefs.getStringSet("completed_dates_set", emptySet())
+                editor.putStringSet("completed_dates_set_$userKey", completedDates)
+                
+                val unlockedBadges = sharedPrefs.getStringSet("unlocked_badges", emptySet())
+                editor.putStringSet("unlocked_badges_$userKey", unlockedBadges)
+                
+                val completedCategories = sharedPrefs.getStringSet("completed_categories", emptySet())
+                editor.putStringSet("completed_categories_$userKey", completedCategories)
+                
+                val completedScenarios = sharedPrefs.getStringSet("completed_scenarios_today", emptySet())
+                editor.putStringSet("completed_scenarios_today_$userKey", completedScenarios)
+                
+                val dailyChallengesJson = sharedPrefs.getString("completed_daily_challenges_json", null)
+                if (dailyChallengesJson != null) {
+                    editor.putString("completed_daily_challenges_json_$userKey", dailyChallengesJson)
+                }
+                
+                val lastSessionDate = sharedPrefs.getString("last_session_date", null)
+                if (lastSessionDate != null) {
+                    editor.putString("last_session_date_$userKey", lastSessionDate)
+                }
+                
+                val completedTodayDate = sharedPrefs.getString("completed_today_date", null)
+                if (completedTodayDate != null) {
+                    editor.putString("completed_today_date_$userKey", completedTodayDate)
+                }
+            } else {
+                // Initialize default fresh zero progress for new user
+                editor.putInt("user_total_xp_$userKey", 0)
+                editor.putInt("user_streak_$userKey", 0)
+                editor.putInt("user_longest_streak_$userKey", 0)
+                editor.putInt("streak_freezes_left_$userKey", 2)
+                editor.putInt("total_practice_days_$userKey", 0)
+                editor.putInt("perfect_weeks_$userKey", 0)
+                editor.putInt("perfect_months_$userKey", 0)
+                editor.putStringSet("completed_dates_set_$userKey", emptySet())
+                editor.putStringSet("unlocked_badges_$userKey", emptySet())
+                editor.putStringSet("completed_categories_$userKey", emptySet())
+                editor.putStringSet("completed_scenarios_today_$userKey", emptySet())
+            }
+            editor.apply()
+        }
+
+        // 2. Load the user-scoped progress values
+        _totalXp.value = sharedPrefs.getInt("user_total_xp_$userKey", 0)
+        _streak.value = sharedPrefs.getInt("user_streak_$userKey", 0)
+        _longestStreak.value = sharedPrefs.getInt("user_longest_streak_$userKey", 0)
+        _streakFreezesLeft.value = sharedPrefs.getInt("streak_freezes_left_$userKey", 2)
+        _totalPracticeDays.value = sharedPrefs.getInt("total_practice_days_$userKey", 0)
+        _perfectWeeks.value = sharedPrefs.getInt("perfect_weeks_$userKey", 0)
+        _perfectMonths.value = sharedPrefs.getInt("perfect_months_$userKey", 0)
+        _completedDates.value = sharedPrefs.getStringSet("completed_dates_set_$userKey", emptySet()) ?: emptySet()
+        _streakSavedMessage.value = sharedPrefs.getString("streak_saved_message_$userKey", null)
+        _unlockedBadgeIds.value = sharedPrefs.getStringSet("unlocked_badges_$userKey", emptySet()) ?: emptySet()
+
+        // 3. Load completed daily challenges
+        _completedDailyChallenges.value = loadCompletedDailyChallenges()
+
+        // 4. Update today's scenarios completion based on userKey
+        val todayStr = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(java.util.Date())
+        val lastSavedDate = sharedPrefs.getString("completed_today_date_$userKey", "") ?: ""
+        if (lastSavedDate == todayStr) {
+            _scenariosCompletedToday.value = sharedPrefs.getStringSet("completed_scenarios_today_$userKey", emptySet()) ?: emptySet()
+        } else {
+            _scenariosCompletedToday.value = emptySet()
             sharedPrefs.edit()
-                .putInt("user_streak", 21)
-                .putInt("user_longest_streak", 42)
-                .putInt("streak_freezes_left", 2)
-                .putInt("total_practice_days", 32)
-                .putInt("perfect_weeks", 4)
-                .putInt("perfect_months", 1)
-                .putStringSet("completed_dates_set", dates)
-                .putString("last_session_date", sdf.format(java.util.Date(System.currentTimeMillis() - 86400000L))) // yesterday
+                .putString("completed_today_date_$userKey", todayStr)
+                .putStringSet("completed_scenarios_today_$userKey", emptySet())
                 .apply()
         }
 
-        _totalXp.value = sharedPrefs.getInt("user_total_xp", 0)
-        _streak.value = sharedPrefs.getInt("user_streak", 0)
-        _longestStreak.value = sharedPrefs.getInt("user_longest_streak", 42)
-        _streakFreezesLeft.value = sharedPrefs.getInt("streak_freezes_left", 2)
-        _totalPracticeDays.value = sharedPrefs.getInt("total_practice_days", 32)
-        _perfectWeeks.value = sharedPrefs.getInt("perfect_weeks", 4)
-        _perfectMonths.value = sharedPrefs.getInt("perfect_months", 1)
-        _completedDates.value = sharedPrefs.getStringSet("completed_dates_set", emptySet()) ?: emptySet()
-        _streakSavedMessage.value = sharedPrefs.getString("streak_saved_message", null)
-        _unlockedBadgeIds.value = sharedPrefs.getStringSet("unlocked_badges", emptySet()) ?: emptySet()
+        // 5. Re-initialize database & DAOs
+        val database = AppDatabase.getDatabase(getApplication(), userKey)
+        repository = SessionRepository(database.sessionDao())
+        personaRepository = PersonaRepository(database.personaDao())
+        
+        personaMemoryDao = database.personaMemoryDao()
+        marketplaceScenarioDao = database.marketplaceScenarioDao()
+        analyzedChatDao = database.analyzedChatDao()
+        liveCoachingSessionDao = database.liveCoachingSessionDao()
+        contactReminderDao = database.contactReminderDao()
+        groupMeetingSessionDao = database.groupMeetingSessionDao()
+        vocalCameraSessionDao = database.vocalCameraSessionDao()
+
+        // 6. Collect from new database flows
+        dbJob?.cancel()
+        dbJob = viewModelScope.launch {
+            launch {
+                repository.allSessions.collect {
+                    _allSessions.value = it
+                }
+            }
+            launch {
+                repository.averageScore.collect {
+                    _averageScore.value = it
+                }
+            }
+            launch {
+                repository.sessionCount.collect {
+                    _sessionCount.value = it
+                }
+            }
+            launch {
+                personaRepository.allPersonas.collect {
+                    _allPersonas.value = it
+                }
+            }
+            launch {
+                analyzedChatDao.getAllAnalyzedChats().collect {
+                    _analyzedChats.value = it
+                }
+            }
+            launch {
+                marketplaceScenarioDao.getAllMarketplaceScenarios().collect {
+                    _marketplaceScenarios.value = it
+                }
+            }
+            launch {
+                liveCoachingSessionDao.getAllSessions().collect {
+                    _liveCoachingSessions.value = it
+                }
+            }
+            launch {
+                contactReminderDao.getAllContactReminders().collect {
+                    _contactReminders.value = it
+                }
+            }
+            launch {
+                groupMeetingSessionDao.getAllGroupMeetingSessions().collect {
+                    _groupMeetingSessions.value = it
+                }
+            }
+            launch {
+                vocalCameraSessionDao.getAllVocalCameraSessions().collect {
+                    _vocalCameraSessions.value = it
+                }
+            }
+        }
     }
 
     private fun getLevelForXp(xp: Int): Int {
@@ -2928,20 +3022,21 @@ class ConversableViewModel(application: Application) : AndroidViewModel(applicat
     private fun computeProgression(session: ConversationSession) {
         val context = getApplication<Application>()
         val sharedPrefs = context.getSharedPreferences("conversable_prefs", Context.MODE_PRIVATE)
+        val userKey = getActiveUserKey()
 
-        val xpBefore = sharedPrefs.getInt("user_total_xp", 0)
-        val streakBefore = sharedPrefs.getInt("user_streak", 0)
-        val lastSessionDate = sharedPrefs.getString("last_session_date", "") ?: ""
-        val completedCategories = sharedPrefs.getStringSet("completed_categories", emptySet()) ?: emptySet()
-        val completedTodayDate = sharedPrefs.getString("completed_today_date", "") ?: ""
-        val unlockedBadgesSet = sharedPrefs.getStringSet("unlocked_badges", emptySet()) ?: emptySet()
+        val xpBefore = sharedPrefs.getInt("user_total_xp_$userKey", 0)
+        val streakBefore = sharedPrefs.getInt("user_streak_$userKey", 0)
+        val lastSessionDate = sharedPrefs.getString("last_session_date_$userKey", "") ?: ""
+        val completedCategories = sharedPrefs.getStringSet("completed_categories_$userKey", emptySet()) ?: emptySet()
+        val completedTodayDate = sharedPrefs.getString("completed_today_date_$userKey", "") ?: ""
+        val unlockedBadgesSet = sharedPrefs.getStringSet("unlocked_badges_$userKey", emptySet()) ?: emptySet()
 
         val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.US)
         val todayStr = sdf.format(Date(System.currentTimeMillis()))
 
         // Reset today's scenarios if day flipped
         val scenariosTodayMutable = if (completedTodayDate == todayStr) {
-            sharedPrefs.getStringSet("completed_scenarios_today", emptySet())?.toMutableSet() ?: mutableSetOf()
+            sharedPrefs.getStringSet("completed_scenarios_today_$userKey", emptySet())?.toMutableSet() ?: mutableSetOf()
         } else {
             mutableSetOf()
         }
@@ -3009,7 +3104,7 @@ class ConversableViewModel(application: Application) : AndroidViewModel(applicat
         var newStreak = streakBefore
         var streakBroken = false
         var streakFreezeUsed = false
-        var freezesLeft = sharedPrefs.getInt("streak_freezes_left", 2)
+        var freezesLeft = sharedPrefs.getInt("streak_freezes_left_$userKey", 2)
         var streakSavedMsg: String? = null
 
         if (lastSessionDate.isEmpty()) {
@@ -3036,11 +3131,11 @@ class ConversableViewModel(application: Application) : AndroidViewModel(applicat
             }
         }
 
-        val longestStreakBefore = sharedPrefs.getInt("user_longest_streak", 42)
+        val longestStreakBefore = sharedPrefs.getInt("user_longest_streak_$userKey", 0)
         val newLongestStreak = maxOf(newStreak, longestStreakBefore)
         
-        val completedDatesSet = sharedPrefs.getStringSet("completed_dates_set", emptySet())?.toMutableSet() ?: mutableSetOf()
-        val totalPracticeDaysBefore = sharedPrefs.getInt("total_practice_days", 32)
+        val completedDatesSet = sharedPrefs.getStringSet("completed_dates_set_$userKey", emptySet())?.toMutableSet() ?: mutableSetOf()
+        val totalPracticeDaysBefore = sharedPrefs.getInt("total_practice_days_$userKey", 0)
         val newTotalPracticeDays = if (completedDatesSet.add(todayStr)) {
             totalPracticeDaysBefore + 1
         } else {
@@ -3214,18 +3309,18 @@ class ConversableViewModel(application: Application) : AndroidViewModel(applicat
         val combinedCategories = completedCategories + session.category
 
         sharedPrefs.edit()
-            .putInt("user_total_xp", xpAfter)
-            .putInt("user_streak", newStreak)
-            .putInt("user_longest_streak", newLongestStreak)
-            .putInt("streak_freezes_left", freezesLeft)
-            .putInt("total_practice_days", newTotalPracticeDays)
-            .putStringSet("completed_dates_set", completedDatesSet)
-            .putString("streak_saved_message", streakSavedMsg)
-            .putString("last_session_date", todayStr)
-            .putString("completed_today_date", todayStr)
-            .putStringSet("completed_scenarios_today", scenariosTodayMutable)
-            .putStringSet("unlocked_badges", combinedBadges)
-            .putStringSet("completed_categories", combinedCategories)
+            .putInt("user_total_xp_$userKey", xpAfter)
+            .putInt("user_streak_$userKey", newStreak)
+            .putInt("user_longest_streak_$userKey", newLongestStreak)
+            .putInt("streak_freezes_left_$userKey", freezesLeft)
+            .putInt("total_practice_days_$userKey", newTotalPracticeDays)
+            .putStringSet("completed_dates_set_$userKey", completedDatesSet)
+            .putString("streak_saved_message_$userKey", streakSavedMsg)
+            .putString("last_session_date_$userKey", todayStr)
+            .putString("completed_today_date_$userKey", todayStr)
+            .putStringSet("completed_scenarios_today_$userKey", scenariosTodayMutable)
+            .putStringSet("unlocked_badges_$userKey", combinedBadges)
+            .putStringSet("completed_categories_$userKey", combinedCategories)
             .apply()
 
         _totalXp.value = xpAfter
@@ -3615,6 +3710,7 @@ class ConversableViewModel(application: Application) : AndroidViewModel(applicat
 
     fun resetAllProgress() {
         viewModelScope.launch {
+            val userKey = getActiveUserKey()
             _savedSessions.value.forEach { session ->
                 val dbId = session.id.toIntOrNull()
                 if (dbId != null) {
@@ -3623,19 +3719,19 @@ class ConversableViewModel(application: Application) : AndroidViewModel(applicat
             }
 
             sharedPrefs.edit()
-                .putInt("user_total_xp", 0)
-                .putInt("user_streak", 0)
-                .putInt("user_longest_streak", 0)
-                .putInt("streak_freezes_left", 2)
-                .putInt("total_practice_days", 0)
-                .putStringSet("completed_dates_set", emptySet())
-                .putString("streak_saved_message", null)
-                .putString("last_session_date", "")
-                .putString("completed_today_date", "")
-                .putStringSet("completed_scenarios_today", emptySet())
-                .putStringSet("unlocked_badges", emptySet())
-                .putStringSet("completed_categories", emptySet())
-                .putString("sessions", "[]")
+                .putInt("user_total_xp_$userKey", 0)
+                .putInt("user_streak_$userKey", 0)
+                .putInt("user_longest_streak_$userKey", 0)
+                .putInt("streak_freezes_left_$userKey", 2)
+                .putInt("total_practice_days_$userKey", 0)
+                .putStringSet("completed_dates_set_$userKey", emptySet())
+                .putString("streak_saved_message_$userKey", null)
+                .putString("last_session_date_$userKey", "")
+                .putString("completed_today_date_$userKey", "")
+                .putStringSet("completed_scenarios_today_$userKey", emptySet())
+                .putStringSet("unlocked_badges_$userKey", emptySet())
+                .putStringSet("completed_categories_$userKey", emptySet())
+                .putString("sessions_$userKey", "[]")
                 .apply()
 
             _totalXp.value = 0

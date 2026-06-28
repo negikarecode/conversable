@@ -84,22 +84,7 @@ data class CommunicationDna(
 object CommunicationDnaCalculator {
     fun calculateDna(sessions: List<SavedSession>): CommunicationDna {
         val totalSessions = sessions.size
-        val level = max(1, 1 + totalSessions / 2)
-        val baseIq = 72
-        
-        val avgScore = if (totalSessions == 0) 75f else sessions.map { it.social_score.toFloat() }.average().toFloat()
-        val computedIq = min(99, max(60, (baseIq + (avgScore - 70) * 0.5f).toInt()))
-        
-        val weeklyGrowth = if (totalSessions > 0) min(15, 3 + totalSessions) else 0
-        val monthlyGrowth = if (totalSessions > 0) min(25, 5 + totalSessions * 2) else 0
-        val lifetimeGrowth = max(0, computedIq - baseIq)
-        val confidenceIntervalMin = max(60, computedIq - 4)
-        val confidenceIntervalMax = min(100, computedIq + 4)
 
-        // Factor to scale traits based on practice history
-        val factor = if (totalSessions == 0) 1.0 else (avgScore / 80.0)
-
-        // 20 Categories implementation
         val categoryData = listOf(
             Triple("Confidence", 78, "Maintained vocal pacing and confident word choices."),
             Triple("Empathy", 82, "Acknowledged feelings before steering or requesting details."),
@@ -123,12 +108,63 @@ object CommunicationDnaCalculator {
             Triple("Question Quality", 78, "Avoided closed yes/no leading questions.")
         )
 
+        if (totalSessions == 0) {
+            val categories = categoryData.map { (name, _, desc) ->
+                CategoryDetail(
+                    name = name,
+                    level = 0,
+                    growthTrend = 0,
+                    confidenceIntervalMin = 0,
+                    confidenceIntervalMax = 0,
+                    explanation = desc
+                )
+            }
+            return CommunicationDna(
+                level = 1,
+                totalSessions = 0,
+                communicationIq = 0,
+                weeklyGrowth = 0,
+                monthlyGrowth = 0,
+                lifetimeGrowth = 0,
+                confidenceIntervalMin = 0,
+                confidenceIntervalMax = 0,
+                primaryStyle = "Unknown / Not Assigned",
+                primaryStyleEmoji = "🔒",
+                primaryStyleReasoning = "DNA Analysis: Locked until enough conversations are completed",
+                archetypeStrengths = emptyList(),
+                archetypeWeaknesses = emptyList(),
+                categories = categories,
+                strengths = emptyList(),
+                weaknesses = emptyList(),
+                recommendedScenarioId = "dating_first_date",
+                recommendedPracticeScenarioTitle = "First Date Coffee Shop",
+                recommendedPracticeSessions = 3,
+                recommendedPracticeExpectedGain = 12,
+                comparisonPercentile = 0
+            )
+        }
+
+        val level = max(1, 1 + totalSessions / 2)
+        val baseIq = 72
+        
+        val avgScore = sessions.map { it.social_score.toFloat() }.average().toFloat()
+        val computedIq = min(99, max(60, (baseIq + (avgScore - 70) * 0.5f).toInt()))
+        
+        val weeklyGrowth = min(15, 3 + totalSessions)
+        val monthlyGrowth = min(25, 5 + totalSessions * 2)
+        val lifetimeGrowth = max(0, computedIq - baseIq)
+        val confidenceIntervalMin = max(60, computedIq - 4)
+        val confidenceIntervalMax = min(100, computedIq + 4)
+
+        // Factor to scale traits based on practice history
+        val factor = avgScore / 80.0
+
         val categories = categoryData.map { (name, baseVal, desc) ->
             val scaleVal = min(100, (baseVal * factor).toInt())
             CategoryDetail(
                 name = name,
                 level = scaleVal,
-                growthTrend = if (totalSessions > 0) (scaleVal / 12) else 0,
+                growthTrend = (scaleVal / 12),
                 confidenceIntervalMin = max(50, scaleVal - 5),
                 confidenceIntervalMax = min(100, scaleVal + 5),
                 explanation = desc
@@ -418,8 +454,8 @@ fun CommunicationDnaScreen(
                             Column {
                                 Text("DNA SCORE", fontSize = 10.sp, color = SleekTextGray)
                                 Text(
-                                    "${dna.communicationIq}",
-                                    fontSize = 36.sp,
+                                    if (dna.communicationIq == 0) "Not Yet Assessed" else "${dna.communicationIq}/100",
+                                    fontSize = if (dna.communicationIq == 0) 18.sp else 36.sp,
                                     fontWeight = FontWeight.Black,
                                     color = SleekTextDark
                                 )
@@ -446,11 +482,11 @@ fun CommunicationDnaScreen(
                         ) {
                             Column {
                                 Text("WEEKLY PROGRESS", fontSize = 9.sp, color = SleekTextGray)
-                                Text("+${dna.weeklyGrowth}%", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = SleekPrimary)
+                                Text(if (dna.weeklyGrowth > 0) "+${dna.weeklyGrowth}%" else "0%", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = SleekPrimary)
                             }
                             Column {
                                 Text("TREND (MONTH)", fontSize = 9.sp, color = SleekTextGray)
-                                Text("+${dna.monthlyGrowth}%", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = SleekPrimary)
+                                Text(if (dna.monthlyGrowth > 0) "+${dna.monthlyGrowth}%" else "0%", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = SleekPrimary)
                             }
                             Column {
                                 Text("PRACTICE STREAK", fontSize = 9.sp, color = SleekTextGray)
