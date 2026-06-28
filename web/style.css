@@ -612,6 +612,10 @@ p {
   stroke-width: 2px;
 }
 
+.btn-primary .btn-icon {
+  stroke: var(--surface) !important;
+}
+
 .inline-icon {
   width: 16px;
   height: 16px;
