@@ -267,6 +267,12 @@ p {
   letter-spacing: -0.04em;
 }
 
+.logo img {
+  height: 64px;
+  width: auto;
+  object-fit: contain;
+}
+
 .logo span {
   font-weight: 900;
 }
