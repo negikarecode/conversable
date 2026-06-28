@@ -1217,9 +1217,13 @@ class ConversableViewModel(application: Application) : AndroidViewModel(applicat
     }
 
     // Key validation
+    fun getGatewayUrl(): String {
+        return sharedPrefs.getString("gateway_url", "http://10.0.2.2:3000") ?: "http://10.0.2.2:3000"
+    }
+
     fun isApiKeyConfigured(): Boolean {
-        val key = getGroqApiKey()
-        return key.startsWith("gsk_") && key.length > 20 && !key.contains("PLACEHOLDER")
+        val gatewayUrl = getGatewayUrl()
+        return gatewayUrl.isNotEmpty()
     }
 
     private fun sanitizePromptInput(input: String): String {
@@ -1281,19 +1285,12 @@ class ConversableViewModel(application: Application) : AndroidViewModel(applicat
         frequencyPenalty: Float? = null,
         presencePenalty: Float? = null
     ): String? = withContext(Dispatchers.IO) {
-        val apiKey = getGroqApiKey()
-        if (apiKey.isEmpty()) return@withContext null
-
-        val pinner = okhttp3.CertificatePinner.Builder()
-            .add("api.groq.com", "sha256/WoiHgitby9pSp4vO9R8RE9Se9q8aT/7DhyReReM=")
-            .add("api.groq.com", "sha256/k2v657WOfXSsvj2Cg3W+T99FGo0GSp16Dszb9N=")
-            .add("api.groq.com", "sha256/NSUwR6RBgH3a1fgXJYTEtVVUxeRgIIRwhID90KEv4Qc=")
-            .build()
+        val gatewayUrl = getGatewayUrl()
+        if (gatewayUrl.isEmpty()) return@withContext null
 
         val client = OkHttpClient.Builder()
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
-            .certificatePinner(pinner)
             .build()
 
         val jsonMediaType = "application/json; charset=utf-8".toMediaType()
@@ -1329,10 +1326,9 @@ class ConversableViewModel(application: Application) : AndroidViewModel(applicat
         val requestJson = moshi.adapter(Any::class.java).toJson(requestMap)
 
         val request = Request.Builder()
-            .url("https://api.groq.com/openai/v1/chat/completions")
+            .url("$gatewayUrl/api/chat")
             .post(requestJson.toRequestBody(jsonMediaType))
             .addHeader("Content-Type", "application/json")
-            .addHeader("Authorization", "Bearer $apiKey")
             .build()
 
         try {
@@ -1342,12 +1338,12 @@ class ConversableViewModel(application: Application) : AndroidViewModel(applicat
                     parseGroqResponse(bodyString)
                 } else {
                     val errBody = response.body?.string() ?: ""
-                    android.util.Log.e("ConversableVM", "Groq error: code=${response.code} body=$errBody")
-                    throw Exception("Groq API error: ${response.code}")
+                    android.util.Log.e("ConversableVM", "Gateway error: code=${response.code} body=$errBody")
+                    throw Exception("Gateway API error: ${response.code}")
                 }
             }
         } catch (e: Exception) {
-            android.util.Log.e("ConversableVM", "Groq exception", e)
+            android.util.Log.e("ConversableVM", "Gateway exception", e)
             throw e
         }
     }
@@ -3496,8 +3492,8 @@ class ConversableViewModel(application: Application) : AndroidViewModel(applicat
     }
 
     private suspend fun transcribeAudioFile(file: java.io.File): String? = withContext(Dispatchers.IO) {
-        val apiKey = getGroqApiKey()
-        if (apiKey.isEmpty()) return@withContext null
+        val gatewayUrl = getGatewayUrl()
+        if (gatewayUrl.isEmpty()) return@withContext null
 
         val client = OkHttpClient.Builder()
             .connectTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
@@ -3514,9 +3510,8 @@ class ConversableViewModel(application: Application) : AndroidViewModel(applicat
             .build()
 
         val request = Request.Builder()
-            .url("https://api.groq.com/openai/v1/audio/transcriptions")
+            .url("$gatewayUrl/api/transcribe")
             .post(requestBody)
-            .addHeader("Authorization", "Bearer $apiKey")
             .build()
 
         try {
@@ -3526,12 +3521,12 @@ class ConversableViewModel(application: Application) : AndroidViewModel(applicat
                     parseWhisperResponse(bodyString)
                 } else {
                     val errBody = response.body?.string() ?: ""
-                    android.util.Log.e("ConversableVM", "Whisper error: code=${response.code} body=$errBody")
-                    throw Exception("Whisper API error: ${response.code}")
+                    android.util.Log.e("ConversableVM", "Gateway whisper error: code=${response.code} body=$errBody")
+                    throw Exception("Gateway whisper API error: ${response.code}")
                 }
             }
         } catch (e: Exception) {
-            android.util.Log.e("ConversableVM", "Whisper exception", e)
+            android.util.Log.e("ConversableVM", "Gateway whisper exception", e)
             throw e
         }
     }

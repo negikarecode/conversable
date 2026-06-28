@@ -1,12 +1,15 @@
 {
   "name": "conversable-startup-landing",
   "version": "1.0.0",
+  "type": "module",
   "description": "Minimalist Scandinavian/Japanese-inspired landing page and live interactive playground for Conversable tech startup.",
   "main": "index.html",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "node --env-file=.env server.js",
+    "dev-server": "node --watch --env-file=.env server.js"
   },
   "keywords": [
     "minimalist",
