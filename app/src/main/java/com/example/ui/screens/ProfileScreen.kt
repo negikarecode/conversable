@@ -390,6 +390,63 @@ fun ProfileScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Developer Settings Card
+            Card(
+                colors = CardDefaults.cardColors(containerColor = BgCard),
+                border = BorderStroke(1.dp, Color(0xFFE2E8F0)),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = "AI Gateway Settings",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = TextPrimary
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Configure the URL of your centralized AI Gateway server.",
+                        fontSize = 12.sp,
+                        color = TextSecondary
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    
+                    val sharedPrefs = remember { context.getSharedPreferences("conversable_prefs", android.content.Context.MODE_PRIVATE) }
+                    var gatewayUrlState by remember { mutableStateOf(sharedPrefs.getString("gateway_url", "http://10.0.2.2:3000") ?: "http://10.0.2.2:3000") }
+                    
+                    OutlinedTextField(
+                        value = gatewayUrlState,
+                        onValueChange = { gatewayUrlState = it },
+                        label = { Text("Gateway Endpoint URL") },
+                        placeholder = { Text("e.g. http://10.0.2.2:3000") },
+                        singleLine = true,
+                        textStyle = androidx.compose.ui.text.TextStyle(fontSize = 14.sp),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    
+                    Spacer(modifier = Modifier.height(12.dp))
+                    
+                    Button(
+                        onClick = {
+                            sharedPrefs.edit().putString("gateway_url", gatewayUrlState.trim()).apply()
+                            android.widget.Toast.makeText(context, "Gateway URL saved successfully!", android.widget.Toast.LENGTH_SHORT).show()
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = SleekPrimary),
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier.fillMaxWidth().height(40.dp)
+                    ) {
+                        Text("Save Gateway URL", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             // Sign Out Button
             Button(
                 onClick = { showSignOutDialog = true },

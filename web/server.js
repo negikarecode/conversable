@@ -133,12 +133,12 @@ const PROVIDERS = {
     endpoint: 'https://api.cerebras.ai/v1/chat/completions',
     apiKeyName: 'CEREBRAS_API_KEY',
     testPayload: {
-      model: 'llama3.1-8b',
+      model: 'gpt-oss-120b',
       messages: [{ role: 'user', content: 'Hello' }],
-      max_tokens: 5
+      max_tokens: 50
     },
     parseResponse: (data) => {
-      return data.choices?.[0]?.message?.content;
+      return data.choices?.[0]?.message?.content || data.choices?.[0]?.message?.reasoning;
     },
     formatPayload: (systemPrompt, messages, temperature, maxTokens) => {
       const formattedMessages = [];
@@ -149,7 +149,7 @@ const PROVIDERS = {
         formattedMessages.push({ role: msg.role, content: msg.content });
       });
       return {
-        model: 'llama3.1-8b',
+        model: 'gpt-oss-120b',
         messages: formattedMessages,
         temperature: temperature || 0.7,
         max_tokens: maxTokens || 150
@@ -187,19 +187,32 @@ function updateLatency(key, latency) {
 
 // Friendly HTTP Error Parsers
 function getFriendlyError(status, errText) {
-  if (status === 401 || status === 403) {
-    return 'Invalid API key / Authentication failed';
+  let message = errText;
+  try {
+    const parsed = JSON.parse(errText);
+    message = parsed.error?.message || parsed.message || errText;
+  } catch (e) {
+    // Not JSON
   }
-  if (status === 429) {
-    return 'Rate limit exceeded';
+
+  const messageLower = message.toLowerCase();
+
+  if (status === 401 || messageLower.includes('api key not valid') || messageLower.includes('invalid api key') || messageLower.includes('invalid_api_key') || messageLower.includes('unauthorized')) {
+    return 'Invalid API key';
   }
-  if (status === 404) {
-    return 'Model not found / Incorrect endpoint';
+  if (status === 403 || messageLower.includes('permission') || messageLower.includes('forbidden')) {
+    return 'Missing permissions';
+  }
+  if (status === 404 || messageLower.includes('not found') || messageLower.includes('endpoint') || messageLower.includes('no route')) {
+    return 'Incorrect endpoint';
+  }
+  if (status === 429 || messageLower.includes('rate limit') || messageLower.includes('quota') || messageLower.includes('too many requests')) {
+    return 'Rate limited';
   }
   if (status >= 500) {
-    return 'Provider internal server error (5xx)';
+    return 'Provider internal server error';
   }
-  return `HTTP ${status}: ${errText.substring(0, 100)}`;
+  return `HTTP ${status}: ${message.substring(0, 100)}`;
 }
 
 // Test Provider
@@ -265,7 +278,12 @@ async function testProvider(key) {
       return false;
     }
   } catch (err) {
-    const reason = err.name === 'AbortError' ? 'Timeout' : `Network error: ${err.message}`;
+    let reason = 'Network error';
+    if (err.name === 'AbortError') {
+      reason = 'Timeout';
+    } else {
+      reason = `Network error: ${err.message}`;
+    }
     healthStates[key].status = 'Unavailable';
     healthStates[key].reason = reason;
     healthStates[key].lastFailure = new Date().toISOString();
@@ -296,30 +314,59 @@ async function verifyRealAiResponses() {
         url += `?key=${apiKey}`;
       } else {
         headers['Authorization'] = `Bearer ${apiKey}`;
+        if (key === 'openrouter') {
+          headers['HTTP-Referer'] = 'https://conversable.app';
+          headers['X-Title'] = 'Conversable';
+        }
       }
       
       const payload = config.formatPayload(null, testMsg, 0.1, 50);
+      
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
+      
       const response = await fetch(url, {
         method: 'POST',
         headers,
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
+        signal: controller.signal
       });
+      
+      clearTimeout(timeoutId);
       
       if (response.ok) {
         const data = await response.json();
         const text = config.parseResponse(data);
         if (text && text.toLowerCase().includes('conversable ai is working')) {
           console.log(`✓ ${config.name} returned valid response: "${text.trim()}"`);
+          healthStates[key].status = 'Healthy';
+          healthStates[key].reason = 'Verification succeeded & AI response verified';
+          healthStates[key].lastSuccess = new Date().toISOString();
         } else if (text) {
           console.log(`⚠️ ${config.name} returned response but did not match prompt: "${text.trim()}"`);
+          healthStates[key].status = 'Degraded';
+          healthStates[key].reason = `AI returned invalid response contents: "${text.trim()}"`;
+          healthStates[key].lastFailure = new Date().toISOString();
         } else {
           console.log(`✗ ${config.name} returned empty text`);
+          healthStates[key].status = 'Degraded';
+          healthStates[key].reason = 'AI returned empty response';
+          healthStates[key].lastFailure = new Date().toISOString();
         }
       } else {
-        console.log(`✗ ${config.name} returned HTTP ${response.status}`);
+        const errText = await response.text().catch(() => '');
+        const friendlyErr = getFriendlyError(response.status, errText);
+        console.log(`✗ ${config.name} failed AI prompt verification: ${friendlyErr}`);
+        healthStates[key].status = 'Unavailable';
+        healthStates[key].reason = `Verification call failed: ${friendlyErr}`;
+        healthStates[key].lastFailure = new Date().toISOString();
       }
     } catch (err) {
-      console.log(`✗ ${config.name} failed during test request: ${err.message}`);
+      const reason = err.name === 'AbortError' ? 'Timeout' : `Network error: ${err.message}`;
+      console.log(`✗ ${config.name} failed during test request: ${reason}`);
+      healthStates[key].status = 'Unavailable';
+      healthStates[key].reason = `Verification call error: ${reason}`;
+      healthStates[key].lastFailure = new Date().toISOString();
     }
   }
   console.log('==================================================\n');
@@ -332,11 +379,11 @@ async function runAllHealthChecks() {
   console.log(' AI GATEWAY STARTUP CONFIGURATION REPORT');
   console.log('==================================================');
   for (const key of Object.keys(PROVIDERS)) {
-    const config = PROVIDERS[key];
+    const displayName = key === 'openrouter' ? 'OpenRouter' : (key.charAt(0).toUpperCase() + key.slice(1));
     if (isProviderConfigured(key)) {
-      console.log(`✓ ${config.name} configured`);
+      console.log(`✓ ${displayName} configured`);
     } else {
-      console.log(`✗ ${config.name} missing API key`);
+      console.log(`✗ ${displayName} missing API key`);
     }
   }
   console.log('==================================================\n');
@@ -424,7 +471,7 @@ async function routeChatRequest(systemPrompt, messages, temperature, maxTokens, 
           healthStates[providerKey].status = 'Healthy';
           healthStates[providerKey].lastSuccess = new Date().toISOString();
           updateLatency(providerKey, latency);
-          return { text, provider: config.name, latency };
+          return { text, provider: config.name, providerKey, latency };
         } else {
           throw new Error('Failed to parse text from provider response');
         }
@@ -450,8 +497,57 @@ async function routeChatRequest(systemPrompt, messages, temperature, maxTokens, 
 
 // JSON Health API
 app.get('/api/health', (c) => {
+  const orderedProviders = Object.keys(PROVIDERS)
+    .filter(key => healthStates[key].status === 'Healthy' || healthStates[key].status === 'Degraded')
+    .sort((a, b) => {
+      if (healthStates[a].status !== healthStates[b].status) {
+        return healthStates[a].status === 'Healthy' ? -1 : 1;
+      }
+      const latA = healthStates[a].avgLatency || 9999;
+      const latB = healthStates[b].avgLatency || 9999;
+      return latA - latB;
+    });
+
+  const configured = Object.keys(PROVIDERS).filter(key => isProviderConfigured(key));
+  const missing = Object.keys(PROVIDERS).filter(key => !isProviderConfigured(key));
+
   return c.json({
     status: Object.values(healthStates).some(p => p.status === 'Healthy') ? 'OK' : 'Degraded',
+    activeProvider: orderedProviders.length > 0 ? PROVIDERS[orderedProviders[0]].name : 'None',
+    configuredProviders: configured.map(k => PROVIDERS[k].name),
+    missingProviders: missing.map(k => PROVIDERS[k].name),
+    timestamp: new Date().toISOString(),
+    providers: healthStates
+  });
+});
+
+// Run Manual Diagnostics Endpoint
+app.post('/api/health/test', async (c) => {
+  console.log('[AI Gateway] Manual health diagnostics triggered...');
+  for (const key of Object.keys(PROVIDERS)) {
+    await testProvider(key);
+  }
+  await verifyRealAiResponses();
+
+  const orderedProviders = Object.keys(PROVIDERS)
+    .filter(key => healthStates[key].status === 'Healthy' || healthStates[key].status === 'Degraded')
+    .sort((a, b) => {
+      if (healthStates[a].status !== healthStates[b].status) {
+        return healthStates[a].status === 'Healthy' ? -1 : 1;
+      }
+      const latA = healthStates[a].avgLatency || 9999;
+      const latB = healthStates[b].avgLatency || 9999;
+      return latA - latB;
+    });
+
+  const configured = Object.keys(PROVIDERS).filter(key => isProviderConfigured(key));
+  const missing = Object.keys(PROVIDERS).filter(key => !isProviderConfigured(key));
+
+  return c.json({
+    status: Object.values(healthStates).some(p => p.status === 'Healthy') ? 'OK' : 'Degraded',
+    activeProvider: orderedProviders.length > 0 ? PROVIDERS[orderedProviders[0]].name : 'None',
+    configuredProviders: configured.map(k => PROVIDERS[k].name),
+    missingProviders: missing.map(k => PROVIDERS[k].name),
     timestamp: new Date().toISOString(),
     providers: healthStates
   });
@@ -459,26 +555,55 @@ app.get('/api/health', (c) => {
 
 // HTML Dashboard
 app.get('/health', (c) => {
+  const orderedProviders = Object.keys(PROVIDERS)
+    .filter(key => healthStates[key].status === 'Healthy' || healthStates[key].status === 'Degraded')
+    .sort((a, b) => {
+      if (healthStates[a].status !== healthStates[b].status) {
+        return healthStates[a].status === 'Healthy' ? -1 : 1;
+      }
+      const latA = healthStates[a].avgLatency || 9999;
+      const latB = healthStates[b].avgLatency || 9999;
+      return latA - latB;
+    });
+
+  const activeProviderName = orderedProviders.length > 0 ? PROVIDERS[orderedProviders[0]].name : 'None (All offline)';
+  const configuredCount = Object.keys(PROVIDERS).filter(k => isProviderConfigured(k)).length;
+  const missingCount = Object.keys(PROVIDERS).filter(k => !isProviderConfigured(k)).length;
+  const gatewayStatus = Object.values(healthStates).some(p => p.status === 'Healthy') ? 'ONLINE' : 'DEGRADED';
+  const gatewayStatusClass = gatewayStatus.toLowerCase();
+
   const providerRows = Object.entries(healthStates).map(([key, state]) => {
     const config = PROVIDERS[key];
     const statusClass = state.status.toLowerCase();
+    const isConfigured = isProviderConfigured(key);
     const lastSuccessStr = state.lastSuccess ? new Date(state.lastSuccess).toLocaleTimeString() : 'Never';
     const lastFailureStr = state.lastFailure ? new Date(state.lastFailure).toLocaleTimeString() : 'Never';
     const latencyStr = state.avgLatency > 0 ? `${state.avgLatency}ms` : 'N/A';
+    const isActive = orderedProviders[0] === key;
     
     return `
-      <div class="provider-card ${statusClass}">
+      <div id="card-${key}" class="provider-card ${statusClass} ${isActive ? 'active-provider-card' : ''}">
         <div class="card-header">
-          <span class="provider-name">${config.name}</span>
-          <span class="status-pill status-${statusClass}">${state.status}</span>
+          <div class="header-name-group">
+            <span class="provider-name">${config.name}</span>
+            ${isActive ? '<span class="active-badge"><i data-lucide="zap"></i> Active Router</span>' : ''}
+          </div>
+          <span id="status-${key}" class="status-pill status-${statusClass}">${state.status}</span>
         </div>
         <div class="card-body">
-          <p><strong>Latency (rolling):</strong> <span class="metric">${latencyStr}</span></p>
-          <p><strong>Total Requests:</strong> <span class="metric">${state.requestCount}</span></p>
-          <p><strong>Failures:</strong> <span class="metric">${state.failureCount}</span></p>
-          <p><strong>Last Success:</strong> ${lastSuccessStr}</p>
-          <p><strong>Last Failure:</strong> ${lastFailureStr}</p>
-          <p class="reason-text"><strong>Details:</strong> ${state.reason}</p>
+          <div class="config-line">
+            <strong>Key Config:</strong> 
+            <span class="code-span">${config.apiKeyName}</span>
+            ${isConfigured ? '<span class="status-dot healthy">✓</span>' : '<span class="status-dot unavailable">✗</span>'}
+          </div>
+          <p><strong>Latency (rolling):</strong> <span id="latency-${key}" class="metric">${latencyStr}</span></p>
+          <p><strong>Total Requests:</strong> <span id="requests-${key}" class="metric">${state.requestCount}</span></p>
+          <p><strong>Failures:</strong> <span id="failures-${key}" class="metric">${state.failureCount}</span></p>
+          <p><strong>Last Success:</strong> <span id="success-${key}">${lastSuccessStr}</span></p>
+          <p><strong>Last Failure:</strong> <span id="failure-${key}">${lastFailureStr}</span></p>
+          <div id="reason-container-${key}" class="reason-text" style="${state.reason ? '' : 'display: none;'}">
+            <strong>Status Details:</strong> <span id="reason-${key}">${state.reason}</span>
+          </div>
         </div>
       </div>
     `;
@@ -492,19 +617,22 @@ app.get('/health', (c) => {
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Conversable AI Gateway Dashboard</title>
       <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+      <script src="https://unpkg.com/lucide@latest"></script>
       <style>
         :root {
-          --bg-color: #0d0e12;
-          --panel-bg: rgba(22, 24, 33, 0.7);
-          --border-color: rgba(255, 255, 255, 0.08);
+          --bg-color: #08090d;
+          --panel-bg: rgba(16, 18, 27, 0.85);
+          --border-color: rgba(255, 255, 255, 0.06);
           --text-primary: #f3f4f6;
           --text-secondary: #9ca3af;
           --healthy-color: #10b981;
-          --healthy-glow: rgba(16, 185, 129, 0.15);
+          --healthy-glow: rgba(16, 185, 129, 0.12);
           --degraded-color: #f59e0b;
-          --degraded-glow: rgba(245, 158, 11, 0.15);
+          --degraded-glow: rgba(245, 158, 11, 0.12);
           --unavailable-color: #ef4444;
-          --unavailable-glow: rgba(239, 68, 68, 0.15);
+          --unavailable-glow: rgba(239, 68, 68, 0.12);
+          --accent-gradient: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+          --card-radius: 16px;
         }
         body {
           margin: 0;
@@ -512,7 +640,9 @@ app.get('/health', (c) => {
           background-color: var(--bg-color);
           color: var(--text-primary);
           font-family: 'Outfit', sans-serif;
-          background-image: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.12) 0%, transparent 50%);
+          background-image: 
+            radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
+            radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.05) 0%, transparent 40%);
           min-height: 100vh;
         }
         .container {
@@ -524,137 +654,426 @@ app.get('/health', (c) => {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          margin-bottom: 40px;
+          margin-bottom: 30px;
           border-bottom: 1px solid var(--border-color);
-          padding-bottom: 20px;
+          padding-bottom: 24px;
         }
-        h1 {
-          font-size: 2.2rem;
+        .header-left h1 {
+          font-size: 2.4rem;
           font-weight: 800;
           margin: 0;
-          background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+          letter-spacing: -0.02em;
+          background: linear-gradient(135deg, #ffffff 30%, #c7d2fe 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
         }
         .subtitle {
           color: var(--text-secondary);
-          margin-top: 5px;
-          font-size: 1rem;
+          margin-top: 6px;
+          font-size: 1.05rem;
+          font-weight: 300;
+          display: flex;
+          align-items: center;
+          gap: 6px;
         }
-        .refresh-btn {
-          background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
+        .controls-group {
+          display: flex;
+          gap: 12px;
+          align-items: center;
+        }
+        .back-btn {
+          background: rgba(255, 255, 255, 0.04);
+          color: var(--text-primary);
+          border: 1px solid var(--border-color);
+          padding: 12px 20px;
+          border-radius: 30px;
+          font-family: inherit;
+          font-weight: 600;
+          text-decoration: none;
+          font-size: 0.95rem;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          transition: all 0.2s ease;
+        }
+        .back-btn:hover {
+          background: rgba(255, 255, 255, 0.08);
+          transform: translateY(-1px);
+        }
+        .diagnostics-btn {
+          background: var(--accent-gradient);
           color: white;
           border: none;
           padding: 12px 24px;
           border-radius: 30px;
           font-family: 'Outfit', sans-serif;
           font-weight: 600;
+          font-size: 0.95rem;
           cursor: pointer;
-          transition: all 0.3s ease;
-          box-shadow: 0 4px 14px rgba(79, 70, 229, 0.4);
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3);
         }
-        .refresh-btn:hover {
+        .diagnostics-btn:hover {
           transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(79, 70, 229, 0.6);
+          box-shadow: 0 6px 20px rgba(79, 70, 229, 0.5);
         }
+        .diagnostics-btn:disabled {
+          background: rgba(255, 255, 255, 0.1);
+          color: var(--text-secondary);
+          cursor: not-allowed;
+          box-shadow: none;
+          transform: none;
+        }
+        
+        /* Summary Banner */
+        .summary-banner {
+          background: var(--panel-bg);
+          border: 1px solid var(--border-color);
+          border-radius: var(--card-radius);
+          padding: 24px;
+          margin-bottom: 30px;
+          backdrop-filter: blur(16px);
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+          gap: 24px;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        .summary-card {
+          display: flex;
+          flex-direction: column;
+        }
+        .summary-label {
+          font-size: 0.85rem;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          color: var(--text-secondary);
+          margin-bottom: 8px;
+          font-weight: 600;
+        }
+        .summary-val {
+          font-size: 1.4rem;
+          font-weight: 700;
+          color: var(--text-primary);
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+        
+        /* Grid Layout */
         .grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+          grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
           gap: 24px;
         }
+        
+        /* Provider Cards */
         .provider-card {
           background: var(--panel-bg);
           border: 1px solid var(--border-color);
-          border-radius: 20px;
+          border-radius: var(--card-radius);
           padding: 24px;
           backdrop-filter: blur(12px);
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          position: relative;
+          overflow: hidden;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        .provider-card::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 4px;
+          height: 100%;
+          background: transparent;
+          transition: background-color 0.3s;
         }
         .provider-card:hover {
-          transform: translateY(-5px);
+          transform: translateY(-4px);
+          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
         }
+        
+        /* Provider Status Coloring */
         .provider-card.healthy {
-          border-color: rgba(16, 185, 129, 0.3);
-          box-shadow: 0 10px 30px var(--healthy-glow);
+          border-color: rgba(16, 185, 129, 0.15);
+        }
+        .provider-card.healthy::before {
+          background-color: var(--healthy-color);
         }
         .provider-card.degraded {
-          border-color: rgba(245, 158, 11, 0.3);
-          box-shadow: 0 10px 30px var(--degraded-glow);
+          border-color: rgba(245, 158, 11, 0.15);
+        }
+        .provider-card.degraded::before {
+          background-color: var(--degraded-color);
         }
         .provider-card.unavailable {
-          border-color: rgba(239, 68, 68, 0.3);
-          box-shadow: 0 10px 30px var(--unavailable-glow);
+          border-color: rgba(239, 68, 68, 0.15);
         }
+        .provider-card.unavailable::before {
+          background-color: var(--unavailable-color);
+        }
+        
+        .active-provider-card {
+          border-color: rgba(99, 102, 241, 0.35) !important;
+          box-shadow: 0 10px 30px rgba(99, 102, 241, 0.1) !important;
+        }
+        
         .card-header {
           display: flex;
           justify-content: space-between;
-          align-items: center;
-          margin-bottom: 20px;
+          align-items: flex-start;
+          margin-bottom: 16px;
+        }
+        .header-name-group {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
         }
         .provider-name {
-          font-size: 1.4rem;
+          font-size: 1.35rem;
           font-weight: 600;
+          letter-spacing: -0.01em;
         }
+        .active-badge {
+          font-size: 0.75rem;
+          font-weight: 600;
+          background: rgba(99, 102, 241, 0.15);
+          color: #a5b4fc;
+          padding: 2px 8px;
+          border-radius: 12px;
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          width: fit-content;
+          border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+        .active-badge svg {
+          width: 10px;
+          height: 10px;
+          fill: currentColor;
+        }
+        
         .status-pill {
-          padding: 6px 14px;
+          padding: 5px 12px;
           border-radius: 20px;
-          font-size: 0.85rem;
+          font-size: 0.75rem;
           font-weight: 600;
           letter-spacing: 0.05em;
           text-transform: uppercase;
+          border: 1px solid transparent;
         }
         .status-healthy {
-          background-color: rgba(16, 185, 129, 0.15);
+          background-color: rgba(16, 185, 129, 0.1);
           color: var(--healthy-color);
-          border: 1px solid var(--healthy-color);
+          border-color: rgba(16, 185, 129, 0.2);
         }
         .status-degraded {
-          background-color: rgba(245, 158, 11, 0.15);
+          background-color: rgba(245, 158, 11, 0.1);
           color: var(--degraded-color);
-          border: 1px solid var(--degraded-color);
+          border-color: rgba(245, 158, 11, 0.2);
         }
         .status-unavailable {
-          background-color: rgba(239, 68, 68, 0.15);
+          background-color: rgba(239, 68, 68, 0.1);
           color: var(--unavailable-color);
-          border: 1px solid var(--unavailable-color);
-          animation: pulse 2s infinite;
+          border-color: rgba(239, 68, 68, 0.2);
         }
+        
         .card-body p {
-          margin: 10px 0;
-          font-size: 0.95rem;
+          margin: 8px 0;
+          font-size: 0.92rem;
           color: var(--text-secondary);
+        }
+        .config-line {
+          margin-bottom: 14px;
+          font-size: 0.9rem;
+          color: var(--text-secondary);
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+        .code-span {
+          font-family: monospace;
+          background: rgba(255, 255, 255, 0.05);
+          padding: 2px 6px;
+          border-radius: 4px;
+          color: var(--text-primary);
+        }
+        .status-dot {
+          font-weight: bold;
+          margin-left: 2px;
+        }
+        .status-dot.healthy {
+          color: var(--healthy-color);
+        }
+        .status-dot.unavailable {
+          color: var(--unavailable-color);
         }
         .metric {
           color: var(--text-primary);
           font-weight: 600;
         }
+        
         .reason-text {
-          font-size: 0.85rem !important;
-          background-color: rgba(0, 0, 0, 0.2);
-          padding: 10px;
+          font-size: 0.85rem;
+          background-color: rgba(0, 0, 0, 0.25);
+          border: 1px solid rgba(255, 255, 255, 0.04);
+          padding: 10px 14px;
           border-radius: 8px;
+          margin-top: 14px;
           word-break: break-all;
+          color: var(--text-secondary);
+          line-height: 1.4;
         }
-        @keyframes pulse {
-          0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
-          70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
-          100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        .reason-text strong {
+          color: var(--text-primary);
+        }
+        
+        /* Spinner */
+        .spinner {
+          width: 14px;
+          height: 14px;
+          border: 2.5px solid rgba(255, 255, 255, 0.3);
+          border-radius: 50%;
+          border-top-color: white;
+          animation: spin 0.8s linear infinite;
+          display: none;
+        }
+        @keyframes spin {
+          to { transform: rotate(360deg); }
         }
       </style>
     </head>
     <body>
       <div class="container">
         <header>
-          <div>
+          <div class="header-left">
             <h1>Conversable AI Gateway</h1>
-            <div class="subtitle">Multi-Provider Intelligent Routing & Failover System</div>
+            <div class="subtitle"><i data-lucide="activity"></i> Multi-Provider Intelligent Routing & Failover System</div>
           </div>
-          <button class="refresh-btn" onclick="location.reload()">Refresh Status</button>
+          <div class="controls-group">
+            <a href="/index.html" class="back-btn"><i data-lucide="arrow-left"></i> Landing Page</a>
+            <button id="run-diagnostics-btn" class="diagnostics-btn" onclick="runDiagnostics()">
+              <span class="spinner" id="btn-spinner"></span>
+              <span id="btn-text">Run Diagnostics</span>
+            </button>
+          </div>
         </header>
-        <div class="grid">
+        
+        <!-- Summary Banner -->
+        <div class="summary-banner">
+          <div class="summary-card">
+            <span class="summary-label">Gateway Status</span>
+            <span id="summary-overall-status" class="summary-val">
+              <span class="status-pill status-${gatewayStatusClass}">${gatewayStatus}</span>
+            </span>
+          </div>
+          <div class="summary-card">
+            <span class="summary-label">Active Provider Target</span>
+            <span id="summary-active-provider" class="summary-val" style="color: #c7d2fe;">
+              ${activeProviderName}
+            </span>
+          </div>
+          <div class="summary-card">
+            <span class="summary-label">Providers Synthesis</span>
+            <span class="summary-val">
+              <span id="summary-configured-count" style="color: var(--healthy-color);">${configuredCount}</span>
+              <span style="color: var(--text-secondary); font-size: 1rem; font-weight: 400; margin: 0 4px;">/</span>
+              <span id="summary-total-count" style="color: var(--text-secondary); font-size: 1.1rem; font-weight: 400;">5</span>
+              <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 400; margin-left: 6px;">Configured</span>
+            </span>
+          </div>
+        </div>
+
+        <div class="grid" id="providers-grid">
           ${providerRows}
         </div>
       </div>
+
+      <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        async function runDiagnostics() {
+          const btn = document.getElementById('run-diagnostics-btn');
+          const btnText = document.getElementById('btn-text');
+          const spinner = document.getElementById('btn-spinner');
+          
+          btn.disabled = true;
+          btnText.textContent = 'Running diagnostics...';
+          spinner.style.display = 'inline-block';
+          
+          try {
+            const res = await fetch('/api/health/test', { method: 'POST' });
+            if (!res.ok) throw new Error('Diagnostics execution failed.');
+            const data = await res.json();
+            
+            // Dynamically update UI
+            updateDashboardUI(data);
+          } catch (err) {
+            alert('Diagnostics failed: ' + err.message);
+          } finally {
+            btn.disabled = false;
+            btnText.textContent = 'Run Diagnostics';
+            spinner.style.display = 'none';
+          }
+        }
+
+        function updateDashboardUI(data) {
+          // 1. Update overall status
+          const gatewayStatusVal = data.status === 'OK' ? 'ONLINE' : 'DEGRADED';
+          const gatewayStatusClass = gatewayStatusVal.toLowerCase();
+          document.getElementById('summary-overall-status').innerHTML = 
+            \`<span class="status-pill status-\${gatewayStatusClass}">\${gatewayStatusVal}</span>\`;
+          
+          // 2. Update active provider
+          document.getElementById('summary-active-provider').textContent = data.activeProvider;
+          
+          // 3. Update configured provider counts
+          document.getElementById('summary-configured-count').textContent = data.configuredProviders.length;
+
+          // 4. Update each provider card
+          Object.entries(data.providers).forEach(([key, state]) => {
+            const card = document.getElementById('card-' + key);
+            const statusPill = document.getElementById('status-' + key);
+            const latencyVal = document.getElementById('latency-' + key);
+            const requestsVal = document.getElementById('requests-' + key);
+            const failuresVal = document.getElementById('failures-' + key);
+            const successVal = document.getElementById('success-' + key);
+            const failureVal = document.getElementById('failure-' + key);
+            const reasonContainer = document.getElementById('reason-container-' + key);
+            const reasonVal = document.getElementById('reason-' + key);
+
+            // Update classes for status colorings
+            card.className = 'provider-card ' + state.status.toLowerCase();
+            if (data.activeProvider === (key === 'gemini' ? 'Google Gemini' : (key === 'openrouter' ? 'OpenRouter' : key.charAt(0).toUpperCase() + key.slice(1)))) {
+              card.classList.add('active-provider-card');
+            }
+
+            statusPill.className = 'status-pill status-' + state.status.toLowerCase();
+            statusPill.textContent = state.status;
+
+            latencyVal.textContent = state.avgLatency > 0 ? state.avgLatency + 'ms' : 'N/A';
+            requestsVal.textContent = state.requestCount;
+            failuresVal.textContent = state.failureCount;
+
+            successVal.textContent = state.lastSuccess ? new Date(state.lastSuccess).toLocaleTimeString() : 'Never';
+            failureVal.textContent = state.lastFailure ? new Date(state.lastFailure).toLocaleTimeString() : 'Never';
+
+            if (state.reason) {
+              reasonContainer.style.display = 'block';
+              reasonVal.textContent = state.reason;
+            } else {
+              reasonContainer.style.display = 'none';
+            }
+          });
+
+          // Refresh the lucide icons in case any badge was added/removed
+          lucide.createIcons();
+        }
+      </script>
     </body>
     </html>
   `;

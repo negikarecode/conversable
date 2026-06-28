@@ -19,6 +19,10 @@
   ],
   "author": "Conversable Team",
   "license": "ISC",
+  "dependencies": {
+    "@hono/node-server": "^1.13.5",
+    "hono": "^4.6.7"
+  },
   "devDependencies": {
     "firebase-tools": "^15.22.3",
     "vite": "^8.1.0"

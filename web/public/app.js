@@ -324,43 +324,135 @@ function chooseOption(index) {
   const improvementsList = document.getElementById('dna-improvements-list');
   improvementsList.innerHTML = '<li>Analyzing speech DNA...</li>';
 
-  setTimeout(() => {
-    // Hide Typing Indicator
+  // Perform dynamic analysis using the active AI provider in the gateway
+  analyzeOptionDynamically(choice, typing, chatContainer, improvementsList);
+}
+
+async function analyzeOptionDynamically(choice, typing, chatContainer, improvementsList) {
+  try {
+    const data = simulatorData[currentScenario];
+    const systemPrompt = `You are an expert communication coach and analyzer.
+You will evaluate the user's response in a roleplay scenario.
+Scenario partner: \${data.partnerName} (\${data.partnerTitle})
+Scenario context/partner prompt: \${data.promptText}
+
+Analyze the user's response: "\${choice.text}"
+
+Provide your feedback in a strict JSON format with these exact keys:
+{
+  "archetype": "A professional 2-3 word label of their communication archetype (e.g. Collaborative Leader, Defensive Vendor, Passive Pleaser)",
+  "score": a number between 0 and 100 representing overall communication effectiveness,
+  "tone": "A 1-2 word description of the tone (e.g. Balanced & Professional, Combative, Too Submissive)",
+  "verdict": "A 1-2 sentence detailed critique of their response, evaluating their assertiveness and empathy",
+  "improvements": [
+    "A specific, constructive bullet point on how to improve this response",
+    "Another specific, constructive bullet point on how to improve this response"
+  ]
+}
+Do NOT wrap the JSON in markdown code blocks. Return ONLY the raw JSON string.`;
+
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: choice.text }
+        ],
+        temperature: 0.2,
+        max_tokens: 400,
+        response_format: { type: 'json_object' }
+      })
+    });
+
     typing.style.display = 'none';
 
+    if (!response.ok) {
+      throw new Error(`HTTP \${response.status}`);
+    }
+
+    const resData = await response.json();
+    const rawContent = resData.choices?.[0]?.message?.content;
+    if (!rawContent) {
+      throw new Error('Empty response content');
+    }
+
+    let jsonText = rawContent.trim();
+    if (jsonText.startsWith('```')) {
+      jsonText = jsonText.replace(/^```(?:json)?\\n?/, '').replace(/\\n?```$/, '');
+    }
+
+    const result = JSON.parse(jsonText);
+    
     // Set DNA scores with animation delay
     setTimeout(() => {
-      document.getElementById('dna-confidence-bar').style.width = `${choice.dna.confidence}%`;
-      document.getElementById('dna-confidence-val').textContent = `${choice.dna.confidence}%`;
+      const baseScore = result.score || choice.score;
+      const confidence = Math.min(100, Math.max(10, baseScore + Math.floor(Math.random() * 15) - 7));
+      const empathy = Math.min(100, Math.max(10, baseScore + Math.floor(Math.random() * 15) - 7));
+      const clarity = Math.min(100, Math.max(10, baseScore + Math.floor(Math.random() * 15) - 7));
+
+      document.getElementById('dna-confidence-bar').style.width = \`\${confidence}%\`;
+      document.getElementById('dna-confidence-val').textContent = \`\${confidence}%\`;
       
-      document.getElementById('dna-empathy-bar').style.width = `${choice.dna.empathy}%`;
-      document.getElementById('dna-empathy-val').textContent = `${choice.dna.empathy}%`;
+      document.getElementById('dna-empathy-bar').style.width = \`\${empathy}%\`;
+      document.getElementById('dna-empathy-val').textContent = \`\${empathy}%\`;
       
-      document.getElementById('dna-clarity-bar').style.width = `${choice.dna.clarity}%`;
-      document.getElementById('dna-clarity-val').textContent = `${choice.dna.clarity}%`;
+      document.getElementById('dna-clarity-bar').style.width = \`\${clarity}%\`;
+      document.getElementById('dna-clarity-val').textContent = \`\${clarity}%\`;
     }, 100);
 
     // Set Verdict Text
+    document.getElementById('dna-badge').textContent = result.archetype || choice.archetype;
+    document.getElementById('dna-score').textContent = \`\${result.score || choice.score}/100\`;
+    document.getElementById('dna-tone-val').textContent = result.tone || choice.tone;
+    document.getElementById('dna-verdict-text').textContent = result.verdict || choice.verdict;
+
+    // Load Suggested Improvements List
+    improvementsList.innerHTML = '';
+    const improvements = result.improvements || choice.improvements;
+    improvements.forEach(imp => {
+      const li = document.createElement('li');
+      li.textContent = imp;
+      improvementsList.appendChild(li);
+    });
+
+  } catch (err) {
+    console.warn('Real AI option analysis failed, falling back to static presets:', err);
+    // Graceful fallback to Scandinavian presets
+    typing.style.display = 'none';
+
+    setTimeout(() => {
+      document.getElementById('dna-confidence-bar').style.width = \`\${choice.dna.confidence}%\`;
+      document.getElementById('dna-confidence-val').textContent = \`\${choice.dna.confidence}%\`;
+      document.getElementById('dna-empathy-bar').style.width = \`\${choice.dna.empathy}%\`;
+      document.getElementById('dna-empathy-val').textContent = \`\${choice.dna.empathy}%\`;
+      document.getElementById('dna-clarity-bar').style.width = \`\${choice.dna.clarity}%\`;
+      document.getElementById('dna-clarity-val').textContent = \`\${choice.dna.clarity}%\`;
+    }, 100);
+
+    // Set Verdict Text from Scandinavian presets
     document.getElementById('dna-badge').textContent = choice.archetype;
-    document.getElementById('dna-score').textContent = `${choice.score}/100`;
+    document.getElementById('dna-score').textContent = \`\${choice.score}/100\`;
     document.getElementById('dna-tone-val').textContent = choice.tone;
     document.getElementById('dna-verdict-text').textContent = choice.verdict;
 
-    // Load Suggested Improvements List
+    // Load Suggested Improvements List from presets
     improvementsList.innerHTML = '';
     choice.improvements.forEach(imp => {
       const li = document.createElement('li');
       li.textContent = imp;
       improvementsList.appendChild(li);
     });
+  }
 
-    // Swap option selector with Reset Button
-    document.getElementById('sim-options-container').style.display = 'none';
-    document.getElementById('sim-reset-container').style.display = 'block';
+  // Swap option selector with Reset Button
+  document.getElementById('sim-options-container').style.display = 'none';
+  document.getElementById('sim-reset-container').style.display = 'block';
 
-    // Scroll chat again
-    chatContainer.scrollTop = chatContainer.scrollHeight;
-  }, 1000);
+  // Scroll chat again
+  chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 
 // 7. APK DOWNLOAD HANDLER (Direct programmatic trigger)
@@ -491,3 +583,167 @@ window.resetSimulator = resetSimulator;
 window.chooseOption = chooseOption;
 window.handleApkDownload = handleApkDownload;
 window.showToast = showToast;
+window.submitCustomResponse = submitCustomResponse;
+
+// 10. SUBMIT CUSTOM RESPONSE (CALLS BACKEND AI GATEWAY)
+async function submitCustomResponse() {
+  const inputEl = document.getElementById('sim-custom-input');
+  const userText = inputEl.value.trim();
+  if (!userText) return;
+
+  trackEvent('simulator_custom_submit', { scenario: currentScenario });
+
+  // Clear input
+  inputEl.value = '';
+  inputEl.blur();
+
+  // Hide options and show reset container
+  document.getElementById('sim-options-container').style.display = 'none';
+  document.getElementById('sim-reset-container').style.display = 'block';
+
+  // Show User Message
+  const userMsgContainer = document.getElementById('sim-user-message');
+  const userMsgText = document.getElementById('sim-user-text');
+  userMsgText.textContent = userText;
+  userMsgContainer.style.display = 'block';
+
+  // Show Typing Indicator
+  const typing = document.getElementById('sim-typing');
+  typing.style.display = 'inline-flex';
+
+  // Scroll to bottom of chat
+  const chatContainer = document.getElementById('chat-messages-container');
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+
+  // Show stats panel in loading state
+  const statsPanel = document.querySelector('.stats-panel');
+  if (statsPanel) {
+    statsPanel.classList.add('show');
+  }
+  document.getElementById('empty-stats-view').style.display = 'none';
+  document.getElementById('active-stats-view').style.display = 'block';
+
+  // Set Tone Analysis and verdict text to "Analyzing..."
+  document.getElementById('dna-badge').textContent = "Analyzing...";
+  document.getElementById('dna-score').textContent = "--/100";
+  document.getElementById('dna-tone-val').textContent = "Calculating metrics...";
+  document.getElementById('dna-verdict-text').textContent = "AI coach is processing your custom response structure, assertiveness levels, and empathy anchors...";
+
+  // Reset bars to 0%
+  document.getElementById('dna-confidence-bar').style.width = '0%';
+  document.getElementById('dna-confidence-val').textContent = '0%';
+  document.getElementById('dna-empathy-bar').style.width = '0%';
+  document.getElementById('dna-empathy-val').textContent = '0%';
+  document.getElementById('dna-clarity-bar').style.width = '0%';
+  document.getElementById('dna-clarity-val').textContent = '0%';
+
+  // Empty improvements list
+  const improvementsList = document.getElementById('dna-improvements-list');
+  improvementsList.innerHTML = '<li>Analyzing speech DNA...</li>';
+
+  try {
+    const data = simulatorData[currentScenario];
+    const systemPrompt = `You are an expert communication coach and analyzer.
+You will evaluate the user's response in a roleplay scenario.
+Scenario partner: \${data.partnerName} (\${data.partnerTitle})
+Scenario context/partner prompt: \${data.promptText}
+
+Analyze the user's response: "\${userText}"
+
+Provide your feedback in a strict JSON format with these exact keys:
+{
+  "archetype": "A professional 2-3 word label of their communication archetype (e.g. Collaborative Leader, Defensive Vendor, Passive Pleaser)",
+  "score": a number between 0 and 100 representing overall communication effectiveness,
+  "tone": "A 1-2 word description of the tone (e.g. Balanced & Professional, Combative, Too Submissive)",
+  "verdict": "A 1-2 sentence detailed critique of their response, evaluating their assertiveness and empathy",
+  "improvements": [
+    "A specific, constructive bullet point on how to improve this response",
+    "Another specific, constructive bullet point on how to improve this response"
+  ]
+}
+Do NOT wrap the JSON in markdown code blocks. Return ONLY the raw JSON string.`;
+
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userText }
+        ],
+        temperature: 0.2,
+        max_tokens: 400,
+        response_format: { type: 'json_object' }
+      })
+    });
+
+    typing.style.display = 'none';
+
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(errText || \`HTTP \${response.status}\`);
+    }
+
+    const resData = await response.json();
+    const rawContent = resData.choices?.[0]?.message?.content;
+    if (!rawContent) {
+      throw new Error('Received empty response from AI');
+    }
+
+    let jsonText = rawContent.trim();
+    if (jsonText.startsWith('```')) {
+      jsonText = jsonText.replace(/^```(?:json)?\\n?/, '').replace(/\\n?```$/, '');
+    }
+
+    const result = JSON.parse(jsonText);
+    
+    // Set DNA scores with animation delay
+    setTimeout(() => {
+      const baseScore = result.score || 70;
+      const confidence = Math.min(100, Math.max(10, baseScore + Math.floor(Math.random() * 15) - 7));
+      const empathy = Math.min(100, Math.max(10, baseScore + Math.floor(Math.random() * 15) - 7));
+      const clarity = Math.min(100, Math.max(10, baseScore + Math.floor(Math.random() * 15) - 7));
+
+      document.getElementById('dna-confidence-bar').style.width = \`\${confidence}%\`;
+      document.getElementById('dna-confidence-val').textContent = \`\${confidence}%\`;
+      
+      document.getElementById('dna-empathy-bar').style.width = \`\${empathy}%\`;
+      document.getElementById('dna-empathy-val').textContent = \`\${empathy}%\`;
+      
+      document.getElementById('dna-clarity-bar').style.width = \`\${clarity}%\`;
+      document.getElementById('dna-clarity-val').textContent = \`\${clarity}%\`;
+    }, 100);
+
+    // Set Verdict Text
+    document.getElementById('dna-badge').textContent = result.archetype || 'Custom Response';
+    document.getElementById('dna-score').textContent = \`\${result.score || 75}/100\`;
+    document.getElementById('dna-tone-val').textContent = result.tone || 'Neutral';
+    document.getElementById('dna-verdict-text').textContent = result.verdict || 'Analysis completed.';
+
+    // Load Suggested Improvements List
+    improvementsList.innerHTML = '';
+    const improvements = result.improvements || [];
+    if (improvements.length === 0) {
+      improvements.push("Ensure your tone maintains balance between empathy and clarity.");
+    }
+    improvements.forEach(imp => {
+      const li = document.createElement('li');
+      li.textContent = imp;
+      improvementsList.appendChild(li);
+    });
+
+  } catch (err) {
+    console.error('Custom response analysis failed:', err);
+    typing.style.display = 'none';
+    document.getElementById('dna-badge').textContent = "Offline";
+    document.getElementById('dna-score').textContent = "--/100";
+    document.getElementById('dna-tone-val').textContent = "Error";
+    document.getElementById('dna-verdict-text').textContent = \`AI Gateway is currently offline or unconfigured. Please check that you have added your API keys in the .env file. (Error: \${err.message})\`;
+    improvementsList.innerHTML = '<li>Check backend console logs for routing diagnostics.</li><li>Make sure the Node.js server is running and healthy.</li>';
+  }
+
+  // Scroll chat again
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+}
