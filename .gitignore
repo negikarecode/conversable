@@ -19,3 +19,7 @@ debug.keystore
 node_modules/
 web/node_modules/
 web/dist/
+*.jks
+*.keystore
+imgs/ZAP_2_17_0_unix.sh
+

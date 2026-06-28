@@ -1,6 +1,21 @@
-// CONVERSABLE APP LANDING PAGE LOGIC
+// CONVERSABLE LANDING PAGE LOGIC & ANALYTICS INTEGRATION
 
-// 1. HERO DEMO SYSTEM
+// 1. PRODUCTION ANALYTICS HELPER
+function trackEvent(eventName, eventParams = {}) {
+  // console.log(`[Analytics Event] ${eventName}`, eventParams); // Debug verify
+  
+  // Google Analytics 4 Integration
+  if (typeof gtag === 'function') {
+    gtag('event', eventName, eventParams);
+  }
+  
+  // Microsoft Clarity Integration
+  if (typeof clarity === 'function') {
+    clarity("event", eventName);
+  }
+}
+
+// 2. HERO DEMO SYSTEM
 function triggerHeroDemo(choice) {
   const userMsgContainer = document.getElementById('hero-demo-user-msg');
   const userMsgText = document.getElementById('hero-demo-user-text');
@@ -9,26 +24,26 @@ function triggerHeroDemo(choice) {
   const actionContainer = document.getElementById('hero-demo-actions');
   const scorePill = feedbackCard.querySelector('.score-pill');
 
-  // Set message text based on selection
   let userText = "";
   let feedback = "";
   let score = "";
 
   if (choice === 'defensive') {
-    userText = "Our tech is 10x better than competitor X, so their marketing budget doesn't matter.";
+    userText = "Our technology is 10x better, so competitor X's advertising budget doesn't matter.";
     score = "Assertiveness: 95% | Empathy: 12%";
     feedback = "Defensive response. By dismissing competitor strengths and their investor's concern rather than providing a structured explanation, you raise defensiveness. Investor interest drops.";
   } else if (choice === 'empathetic') {
-    userText = "Competitor X's CAC is lower due to paid ads. We rely on organic developer word-of-mouth. Let me share our growth metrics.";
+    userText = "Competitor X relies on paid ads. We grow organically via developer word-of-mouth. Let me share the CAC metrics.";
     score = "Assertiveness: 88% | Empathy: 92%";
     feedback = "Excellent response. You validated their market query, demonstrated objective understanding of Competitor X's growth loop, and pivoted to your organic developer moat backed by hard data.";
   }
 
+  // Track event
+  trackEvent('hero_demo_choice', { choice_type: choice });
+
   // Display user response
   userMsgText.textContent = `"${userText}"`;
   userMsgContainer.style.display = 'block';
-  
-  // Hide choice buttons
   actionContainer.style.display = 'none';
 
   // Wait, show typing simulation, then show feedback
@@ -36,11 +51,11 @@ function triggerHeroDemo(choice) {
     scorePill.textContent = score;
     feedbackText.textContent = feedback;
     feedbackCard.style.display = 'block';
-  }, 700);
+  }, 600);
 }
 
 
-// 2. PLAYGROUND SIMULATOR DATA
+// 3. PLAYGROUND SIMULATOR DATA
 const simulatorData = {
   negotiation: {
     partnerName: "Marcus Vance",
@@ -187,20 +202,26 @@ const simulatorData = {
 
 let currentScenario = 'negotiation';
 
-// 3. SWITCH SCENARIOS
+// 4. SWITCH SCENARIOS
 function selectScenario(scenarioKey, tabElement) {
   currentScenario = scenarioKey;
   
   // Update Active Tab
   const tabs = document.querySelectorAll('.scenario-tab');
-  tabs.forEach(tab => tab.classList.remove('active'));
+  tabs.forEach(tab => {
+    tab.classList.remove('active');
+    tab.setAttribute('aria-selected', 'false');
+  });
   tabElement.classList.add('active');
+  tabElement.setAttribute('aria-selected', 'true');
+
+  trackEvent('simulator_scenario_select', { scenario: scenarioKey });
 
   // Reset simulator state
   resetSimulator();
 }
 
-// 4. RESET SIMULATOR
+// 5. RESET SIMULATOR
 function resetSimulator() {
   const data = simulatorData[currentScenario];
   
@@ -245,11 +266,13 @@ function resetSimulator() {
   document.getElementById('dna-clarity-val').textContent = '0%';
 }
 
-// 5. SELECT SIMULATOR OPTION
+// 6. SELECT SIMULATOR OPTION
 function chooseOption(index) {
   const optionIndex = index - 1;
   const data = simulatorData[currentScenario];
   const choice = data.options[optionIndex];
+
+  trackEvent('simulator_option_click', { scenario: currentScenario, choice: choice.num });
 
   // Highlight selected option and disable others using CSS classes
   const buttons = document.querySelectorAll('.option-btn');
@@ -337,73 +360,35 @@ function chooseOption(index) {
 
     // Scroll chat again
     chatContainer.scrollTop = chatContainer.scrollHeight;
-  }, 1200);
+  }, 1000);
 }
 
-
-// 6. SIGNUP FLOW FOR BOTH FORMS
-function handleSignup(formElement) {
-  const emailInput = formElement.querySelector('.form-input');
-  const submitBtn = formElement.querySelector('.btn-submit');
-  const email = emailInput.value;
-
-  // Visual feedback: Loading state
-  const btnSpan = submitBtn.querySelector('span');
-  const originalText = btnSpan.textContent;
-  btnSpan.textContent = "Joining Waitlist...";
-  submitBtn.disabled = true;
-  emailInput.disabled = true;
-
-  setTimeout(() => {
-    if (formElement.id === 'hero-signup-form') {
-      btnSpan.textContent = "Joined!";
-      
-      const successNotif = document.getElementById('success-notification');
-      const emailDisplay = document.getElementById('success-email-display');
-      
-      emailDisplay.textContent = email;
-      successNotif.style.display = 'flex';
-      
-      // Smooth scroll to success section
-      document.getElementById('signup-section').scrollIntoView({ behavior: 'smooth' });
-    } else {
-      formElement.style.display = 'none';
-      
-      const successNotif = document.getElementById('success-notification');
-      const emailDisplay = document.getElementById('success-email-display');
-      
-      emailDisplay.textContent = email;
-      successNotif.style.display = 'flex';
-    }
-  }, 1200);
-}
-
-// APK Download Handler (with loading state and error handling)
+// 7. APK DOWNLOAD HANDLER (with loading states & head check)
 function handleApkDownload(event, buttonElement) {
   if (event) event.preventDefault();
   
   if (!buttonElement) return;
   if (buttonElement.classList.contains('loading')) return;
   
+  trackEvent('apk_download_attempt', { source_id: buttonElement.id || 'inline' });
+
   // Save original styles/text
   const originalText = buttonElement.innerHTML;
   buttonElement.classList.add('loading');
   buttonElement.style.pointerEvents = 'none';
   
-  // Set loading text / state
-  const isButton = buttonElement.tagName === 'BUTTON' || buttonElement.classList.contains('btn') || buttonElement.classList.contains('btn-sticky-apk');
   const textSpan = buttonElement.querySelector('span') || buttonElement;
+  let prevText = textSpan ? textSpan.textContent : 'Download APK';
   
-  let prevText = textSpan ? textSpan.textContent : '';
-  if (isButton && textSpan) {
+  if (textSpan) {
     textSpan.textContent = 'Preparing...';
   }
   
-  // Perform HEAD request to check availability & handle errors
+  // Perform HEAD request to check availability
   fetch('/conversable.apk', { method: 'HEAD' })
     .then(response => {
       if (response.ok) {
-        if (isButton && textSpan) {
+        if (textSpan) {
           textSpan.textContent = 'Downloading...';
         }
         
@@ -418,31 +403,32 @@ function handleApkDownload(event, buttonElement) {
         setTimeout(() => {
           buttonElement.classList.remove('loading');
           buttonElement.style.pointerEvents = 'auto';
-          if (isButton && textSpan) {
+          if (textSpan) {
             textSpan.textContent = prevText;
           } else {
             buttonElement.innerHTML = originalText;
           }
           showToast('Download started successfully!');
-        }, 1500);
+          trackEvent('apk_download_success');
+        }, 1200);
       } else {
         throw new Error('APK file not found on the server.');
       }
     })
     .catch(error => {
-      console.error('Download failed:', error);
       buttonElement.classList.remove('loading');
       buttonElement.style.pointerEvents = 'auto';
-      if (isButton && textSpan) {
+      if (textSpan) {
         textSpan.textContent = prevText;
       } else {
         buttonElement.innerHTML = originalText;
       }
       showToast('Error: Failed to fetch APK. Please try again later.');
+      trackEvent('apk_download_failure', { error: error.message });
     });
 }
 
-// Custom Toast notification helper
+// 8. CUSTOM TOAST HELPER
 function showToast(message) {
   let toast = document.getElementById('apk-toast');
   if (!toast) {
@@ -451,7 +437,7 @@ function showToast(message) {
     document.body.appendChild(toast);
   }
   toast.textContent = message;
-  toast.offsetHeight; // trigger layout reflow
+  toast.offsetHeight; // trigger reflow
   toast.classList.add('show');
   
   if (window.toastTimeout) {
@@ -462,39 +448,58 @@ function showToast(message) {
   }, 3000);
 }
 
-// Initialize on page load
+// 9. SCROLL DEPTH & SESSION DURATION TRACKING
+let maxScroll = 0;
+function trackScrollDepth() {
+  const scrollTop = window.scrollY || document.documentElement.scrollTop;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  if (docHeight > 0) {
+    const scrollPercent = Math.min(Math.round((scrollTop / docHeight) * 100), 100);
+    if (scrollPercent > maxScroll) {
+      maxScroll = scrollPercent;
+      if (maxScroll % 25 === 0 && maxScroll > 0) {
+        trackEvent('scroll_depth', { percent: maxScroll });
+      }
+    }
+  }
+}
+
+// Initialize on DOM Load
 window.addEventListener('DOMContentLoaded', () => {
   if (typeof lucide !== 'undefined') {
     lucide.createIcons();
   }
   resetSimulator();
 
-  // Sticky CTA Bar scroll behavior (combined logic)
+  // Track session start
+  trackEvent('session_start');
+
+  // Track scroll depth
+  window.addEventListener('scroll', trackScrollDepth);
+
+  // Sticky CTA Bar scroll behavior
   const stickyBar = document.getElementById('sticky-cta-bar');
   if (stickyBar) {
     const handleScroll = () => {
-      const pricingSection = document.getElementById('pricing');
-      const ctaSection = document.getElementById('signup-section');
+      const playgroundSection = document.getElementById('playground');
       const footerSection = document.querySelector('.footer-section');
       const heroSection = document.querySelector('.hero-section');
       
       const scrollY = window.scrollY + window.innerHeight;
       const heroHeight = heroSection?.offsetHeight || 400;
-      
       const isPastHero = window.scrollY > heroHeight;
       
-      const hideZones = [pricingSection, ctaSection, footerSection]
+      const hideZones = [playgroundSection, footerSection]
         .filter(Boolean)
-        .map(el => el.offsetTop - 200);
+        .map(el => el.offsetTop - 100);
       
-      const shouldHide = hideZones.some(zone => scrollY >= zone + 200);
+      const shouldHide = hideZones.some(zone => scrollY >= zone + 100);
       
       if (isPastHero && !shouldHide && window.innerWidth <= 768) {
         stickyBar.style.transform = 'translateY(0)';
       } else {
         stickyBar.style.transform = 'translateY(100%)';
       }
-      stickyBar.style.transition = 'transform 250ms ease';
     };
     window.addEventListener('scroll', handleScroll);
     window.addEventListener('resize', handleScroll);
@@ -507,6 +512,5 @@ window.triggerHeroDemo = triggerHeroDemo;
 window.selectScenario = selectScenario;
 window.resetSimulator = resetSimulator;
 window.chooseOption = chooseOption;
-window.handleSignup = handleSignup;
 window.handleApkDownload = handleApkDownload;
 window.showToast = showToast;
