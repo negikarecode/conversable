@@ -246,17 +246,19 @@
           </p>
         </div>
 
-        <!-- Tabs -->
-        <div class="scenario-selector" role="tablist" aria-label="Interactive Scenarios">
-          <button class="scenario-tab active" role="tab" aria-selected="true" onclick="selectScenario('negotiation', this)">
-            Salary Negotiation
-          </button>
-          <button class="scenario-tab" role="tab" aria-selected="false" onclick="selectScenario('criticism', this)">
-            Handling Criticism
-          </button>
-          <button class="scenario-tab" role="tab" aria-selected="false" onclick="selectScenario('networking', this)">
-            Elevator Pitch
-          </button>
+        <!-- Tabs (Wrapped in container to clip negative margin overflow) -->
+        <div class="tabs-container" style="width: 100%; overflow: hidden; position: relative;">
+          <div class="scenario-selector" role="tablist" aria-label="Interactive Scenarios">
+            <button class="scenario-tab active" role="tab" aria-selected="true" onclick="selectScenario('negotiation', this)">
+              Salary Negotiation
+            </button>
+            <button class="scenario-tab" role="tab" aria-selected="false" onclick="selectScenario('criticism', this)">
+              Handling Criticism
+            </button>
+            <button class="scenario-tab" role="tab" aria-selected="false" onclick="selectScenario('networking', this)">
+              Elevator Pitch
+            </button>
+          </div>
         </div>
 
         <div class="simulator-grid">
