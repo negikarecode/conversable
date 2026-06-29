@@ -158,20 +158,27 @@ const PROVIDERS = {
   }
 };
 
-// Health States tracking
-const healthStates = {
-  gemini: { status: 'Unavailable', reason: 'Not verified', lastSuccess: null, lastFailure: null, avgLatency: 0, requestCount: 0, failureCount: 0 },
-  groq: { status: 'Unavailable', reason: 'Not verified', lastSuccess: null, lastFailure: null, avgLatency: 0, requestCount: 0, failureCount: 0 },
-  openrouter: { status: 'Unavailable', reason: 'Not verified', lastSuccess: null, lastFailure: null, avgLatency: 0, requestCount: 0, failureCount: 0 },
-  mistral: { status: 'Unavailable', reason: 'Not verified', lastSuccess: null, lastFailure: null, avgLatency: 0, requestCount: 0, failureCount: 0 },
-  cerebras: { status: 'Unavailable', reason: 'Not verified', lastSuccess: null, lastFailure: null, avgLatency: 0, requestCount: 0, failureCount: 0 }
-};
-
 // Check if a provider has a valid key configured in process.env
 function isProviderConfigured(key) {
   const config = PROVIDERS[key];
   const apiKey = process.env[config.apiKeyName];
   return apiKey && apiKey !== '' && !apiKey.includes('PLACEHOLDER') && !apiKey.includes('YOUR_') && !apiKey.includes('MY_');
+}
+
+// Health States tracking - Initialize configured providers as Healthy (awaiting verification)
+// to prevent cold start routing blackouts.
+const healthStates = {};
+for (const key of Object.keys(PROVIDERS)) {
+  const isConfigured = isProviderConfigured(key);
+  healthStates[key] = {
+    status: isConfigured ? 'Healthy' : 'Unavailable',
+    reason: isConfigured ? 'Configured (Awaiting verification)' : `API Key ${PROVIDERS[key].apiKeyName} is missing or placeholder`,
+    lastSuccess: null,
+    lastFailure: null,
+    avgLatency: isConfigured ? 1000 : 0,
+    requestCount: 0,
+    failureCount: 0
+  };
 }
 
 // Update rolling latency
@@ -242,7 +249,7 @@ async function testProvider(key) {
     }
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout for health validation
 
     const response = await fetch(url, {
       method: 'POST',
@@ -291,16 +298,16 @@ async function testProvider(key) {
   }
 }
 
-// Send real test prompt to every healthy provider to verify AI response
+// Send real test prompt to every healthy provider to verify AI response in parallel
 async function verifyRealAiResponses() {
   console.log('\n==================================================');
-  console.log(' RUNNING REAL AI RESPONSE VERIFICATION TESTS');
+  console.log(' RUNNING REAL AI RESPONSE VERIFICATION TESTS IN PARALLEL');
   console.log('==================================================');
   
-  for (const key of Object.keys(PROVIDERS)) {
+  const promises = Object.keys(PROVIDERS).map(async (key) => {
     if (healthStates[key].status !== 'Healthy') {
       console.log(`- Skipping ${PROVIDERS[key].name} (not healthy / missing key)`);
-      continue;
+      return;
     }
     
     console.log(`Testing real AI response from ${PROVIDERS[key].name}...`);
@@ -323,7 +330,7 @@ async function verifyRealAiResponses() {
       const payload = config.formatPayload(null, testMsg, 0.1, 50);
       
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
+      const timeoutId = setTimeout(() => controller.abort(), 8000); // 8s timeout for real AI response
       
       const response = await fetch(url, {
         method: 'POST',
@@ -368,11 +375,13 @@ async function verifyRealAiResponses() {
       healthStates[key].reason = `Verification call error: ${reason}`;
       healthStates[key].lastFailure = new Date().toISOString();
     }
-  }
+  });
+
+  await Promise.all(promises);
   console.log('==================================================\n');
 }
 
-// Startup checks
+// Startup checks - run in parallel
 async function runAllHealthChecks() {
   // 1. Output Startup Configuration Report
   console.log('==================================================');
@@ -388,24 +397,22 @@ async function runAllHealthChecks() {
   }
   console.log('==================================================\n');
 
-  // 2. Perform Validation Requests
-  console.log('[AI Gateway] Running startup validation health checks...');
-  for (const key of Object.keys(PROVIDERS)) {
+  // 2. Perform Validation Requests in Parallel
+  console.log('[AI Gateway] Running startup validation health checks in parallel...');
+  await Promise.all(Object.keys(PROVIDERS).map(async (key) => {
     await testProvider(key);
     console.log(`[AI Gateway] ${PROVIDERS[key].name}: ${healthStates[key].status} (${healthStates[key].reason})`);
-  }
+  }));
 
   // 3. Verify Real AI Output Responses
   await verifyRealAiResponses();
 }
 
-// Background scheduler
+// Background scheduler - run in parallel and more frequently to recover quickly
 setInterval(async () => {
-  console.log('[AI Gateway] Running periodic health checks...');
-  for (const key of Object.keys(PROVIDERS)) {
-    await testProvider(key);
-  }
-}, 3 * 60 * 1000); // 3 mins
+  console.log('[AI Gateway] Running periodic health checks in parallel...');
+  await Promise.all(Object.keys(PROVIDERS).map(key => testProvider(key)));
+}, 60 * 1000); // 1 min
 
 // Intelligent routing & failover
 async function routeChatRequest(systemPrompt, messages, temperature, maxTokens, forceJson) {
@@ -450,7 +457,7 @@ async function routeChatRequest(systemPrompt, messages, temperature, maxTokens, 
       }
 
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s request timeout
+      const timeoutId = setTimeout(() => controller.abort(), 6000); // 6s request timeout for fast failover
 
       const payload = config.formatPayload(systemPrompt, messages, temperature, maxTokens, forceJson);
 
