@@ -533,7 +533,7 @@ fun ActiveConversationScreen(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .height(animatedHeight)
-                                        .background(Color.White)
+                                        .background(SleekSurface)
                                         .clipToBounds()
                                         .drawWithContent {
                                             drawContent()

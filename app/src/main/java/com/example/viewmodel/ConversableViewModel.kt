@@ -1283,7 +1283,8 @@ class ConversableViewModel(application: Application) : AndroidViewModel(applicat
         forceJson: Boolean = false,
         topP: Float? = null,
         frequencyPenalty: Float? = null,
-        presencePenalty: Float? = null
+        presencePenalty: Float? = null,
+        images: List<String>? = null
     ): String? = withContext(Dispatchers.IO) {
         val gatewayUrl = getGatewayUrl()
         if (gatewayUrl.isEmpty()) return@withContext null
@@ -1310,6 +1311,12 @@ class ConversableViewModel(application: Application) : AndroidViewModel(applicat
             "temperature" to temperature,
             "max_tokens" to maxTokens
         )
+        if (images != null && images.isNotEmpty()) {
+            val imgList = images.map { base64 ->
+                mapOf("mimeType" to "image/jpeg", "data" to base64)
+            }
+            requestMap["images"] = imgList
+        }
         if (topP != null) {
             requestMap["top_p"] = topP
         }
@@ -2634,6 +2641,7 @@ class ConversableViewModel(application: Application) : AndroidViewModel(applicat
                     chatMessages = listOf(ChatMessage("", prompt, true)),
                     temperature = 0.7f,
                     maxTokens = 600,
+                    forceJson = true,
                     topP = 0.95f,
                     frequencyPenalty = 0.0f,
                     presencePenalty = 0.0f
@@ -2681,20 +2689,20 @@ class ConversableViewModel(application: Application) : AndroidViewModel(applicat
                         addCustomScenario(builtScenario)
                         onSuccess(builtScenario)
                     } else {
-                        _aiError.value = "AI Connection Error: Scenario format was incorrect."
+                        _aiError.value = "The AI returned an invalid scenario format. A fallback scenario has been created."
                         val scenario = simulateScenarioResult(userInput)
                         addCustomScenario(scenario)
                         onSuccess(scenario)
                     }
                 } else {
-                    _aiError.value = "AI Connection Error: Empty response from scenario architect."
+                    _aiError.value = "The AI returned an empty response. A fallback scenario has been created."
                     val scenario = simulateScenarioResult(userInput)
                     addCustomScenario(scenario)
                     onSuccess(scenario)
                 }
 
             } catch (e: Exception) {
-                _aiError.value = "AI Connection Error: ${e.message ?: "Unknown error"}"
+                _aiError.value = "We couldn't connect to the AI. A fallback scenario has been created."
                 val scenario = simulateScenarioResult(userInput)
                 addCustomScenario(scenario)
                 onSuccess(scenario)
@@ -3904,56 +3912,118 @@ class ConversableViewModel(application: Application) : AndroidViewModel(applicat
         }
     }
 
-    suspend fun analyzeChat(rawText: String, source: String, anonymize: Boolean, title: String) {
-        val systemPrompt = """
-            You are an expert communication coach and relationship analyst.
-            Analyze the following conversation transcript.
-            
-            Return ONLY a valid JSON object matching this exact schema:
-            {
-              "relationshipScore": 72,
-              "relationshipSummary": "Summary of the relationship dynamics...",
-              "communicationStyle": "Balanced / Anxious / Avoidant",
-              "actionableAdvice": "Specific actionable coaching recommendations...",
-              "redFlags": [
+    suspend fun analyzeChat(rawText: String, source: String, anonymize: Boolean, title: String, images: List<String>? = null) {
+        val systemPrompt = if (images != null && images.isNotEmpty()) {
+            """
+                You are an expert communication coach, relationship analyst, and screenshot OCR assistant.
+                The user has uploaded one or more screenshots of a chat conversation (e.g. WhatsApp, Instagram, Telegram, Discord, Snapchat, Messenger, SMS, Email, etc.).
+                
+                First, extract the conversation from the screenshot(s):
+                1. Read the text using OCR.
+                2. Detect the logical message order and timestamps (if visible).
+                3. Reconstruct the full conversation flow.
+                4. Identify who sent each message (map participants: "Me" for the user, and "Partner" for the other person).
+                5. Merge multiple screenshots automatically. Ignore UI elements, background noise, status bars, and input fields.
+                
+                Then, perform a deep analysis of the conversation:
+                1. Tone & communication style (Balanced / Anxious / Avoidant / Direct / Passive Aggressive).
+                2. Emotional intelligence (EQ), confidence, flirting signals, interest level.
+                3. Identify any red flags (manipulation, toxicity, guilt-tripping) and green flags (active listening, vulnerability).
+                4. Suggest missed opportunities and rewrite better responses for "Me".
+                5. Give an overall conversation quality score from 1 to 100.
+                
+                You MUST return ONLY a valid JSON object matching this exact schema:
                 {
-                  "flag": "Passive Aggression",
-                  "quote": "Exact quote from transcript",
-                  "explanation": "Why this is a red flag"
+                  "relationshipScore": 72,
+                  "relationshipSummary": "Summary of the relationship dynamics and interest level...",
+                  "communicationStyle": "Avoidant / Anxious / Balanced",
+                  "actionableAdvice": "Specific actionable coaching recommendations...",
+                  "redFlags": [
+                    {
+                      "flag": "Flag name",
+                      "quote": "Exact quote from screenshot",
+                      "explanation": "Why this is a red flag"
+                    }
+                  ],
+                  "greenFlags": [
+                    {
+                      "flag": "Flag name",
+                      "quote": "Exact quote from screenshot",
+                      "explanation": "Why this is a green flag"
+                    }
+                  ],
+                  "messages": [
+                    {
+                      "sender": "Me",
+                      "text": "Extracted message text"
+                    },
+                    {
+                      "sender": "Partner",
+                      "text": "Extracted message text"
+                    }
+                  ]
                 }
-              ],
-              "greenFlags": [
+                
+                Do not include any markdown format blocks, introductory text, or 'json' headers. Just raw JSON.
+            """.trimIndent()
+        } else {
+            """
+                You are an expert communication coach and relationship analyst.
+                Analyze the following conversation transcript.
+                
+                Return ONLY a valid JSON object matching this exact schema:
                 {
-                  "flag": "Active Empathy",
-                  "quote": "Exact quote",
-                  "explanation": "Why this is a green flag"
+                  "relationshipScore": 72,
+                  "relationshipSummary": "Summary of the relationship dynamics...",
+                  "communicationStyle": "Balanced / Anxious / Avoidant",
+                  "actionableAdvice": "Specific actionable coaching recommendations...",
+                  "redFlags": [
+                    {
+                      "flag": "Passive Aggression",
+                      "quote": "Exact quote from transcript",
+                      "explanation": "Why this is a red flag"
+                    }
+                  ],
+                  "greenFlags": [
+                    {
+                      "flag": "Active Empathy",
+                      "quote": "Exact quote",
+                      "explanation": "Why this is a green flag"
+                    }
+                  ],
+                  "messages": [
+                    {
+                      "sender": "Me",
+                      "text": "original message text"
+                    }
+                  ]
                 }
-              ],
-              "messages": [
-                {
-                  "sender": "Me",
-                  "text": "original message text"
-                }
-              ]
-            }
-            
-            All keys must match this exact schema. If there are no flags, return an empty list. 
-            Do not include any markdown format blocks or introductory text. Just raw JSON.
-        """.trimIndent()
+                
+                All keys must match this exact schema. If there are no flags, return an empty list. 
+                Do not include any markdown format blocks or introductory text. Just raw JSON.
+            """.trimIndent()
+        }
+
+        val promptText = if (images != null && images.isNotEmpty()) {
+            "Please extract and analyze the conversation from the attached screenshot(s)."
+        } else {
+            rawText
+        }
 
         val response = callGroq(
             systemPrompt = systemPrompt,
-            chatMessages = listOf(ChatMessage(id = "1", text = rawText, isUser = true)),
+            chatMessages = listOf(ChatMessage(id = "1", text = promptText, isUser = true)),
             temperature = 0.5f,
             maxTokens = 1200,
-            forceJson = true
+            forceJson = true,
+            images = images
         )
 
         if (!response.isNullOrBlank()) {
             val entity = com.example.data.db.AnalyzedChatEntity(
                 source = source,
                 chatTitle = title,
-                rawText = rawText,
+                rawText = promptText,
                 analysisResultJson = response
             )
             analyzedChatDao.insertAnalyzedChat(entity)

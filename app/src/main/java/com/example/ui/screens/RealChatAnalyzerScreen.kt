@@ -28,6 +28,17 @@ import com.example.viewmodel.ConversableViewModel
 import kotlinx.coroutines.launch
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import android.net.Uri
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.util.Base64
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextOverflow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,6 +55,18 @@ fun RealChatAnalyzerScreen(
     var selectedAnalysis by remember { mutableStateOf<AnalyzedChatEntity?>(null) }
     var chatInputText by remember { mutableStateOf("") }
     var chatTitle by remember { mutableStateOf("") }
+    
+    // Screenshot Upload State
+    var selectedImageUris by remember { mutableStateOf<List<Uri>>(emptyList()) }
+    var isPasteChatExpanded by remember { mutableStateOf(false) }
+    
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetMultipleContents()
+    ) { uris ->
+        if (uris != null) {
+            selectedImageUris = uris
+        }
+    }
     
     // Privacy Controls
     var anonymizeNames by remember { mutableStateOf(true) }
@@ -337,65 +360,165 @@ fun RealChatAnalyzerScreen(
                             shape = RoundedCornerShape(12.dp)
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
-                                Text("ANALYZE REAL CONVERSATION", style = TextSm.copy(fontWeight = FontWeight.Bold))
+                                Text("ANALYZE CONVERSATION", style = TextSm.copy(fontWeight = FontWeight.Bold, color = SleekTextDark))
                                 Spacer(modifier = Modifier.height(12.dp))
                                 
                                 OutlinedTextField(
                                     value = chatTitle,
                                     onValueChange = { chatTitle = it },
-                                    label = { Text("Conversation Title (e.g. Chat with Partner)") },
+                                    label = { Text("Conversation Title (e.g. Chat with Taylor)") },
                                     modifier = Modifier.fillMaxWidth(),
                                     colors = OutlinedTextFieldDefaults.colors(
                                         focusedBorderColor = SleekPrimary,
-                                        unfocusedBorderColor = SleekBorder
+                                        unfocusedBorderColor = SleekBorder,
+                                        focusedTextColor = SleekTextDark,
+                                        unfocusedTextColor = SleekTextDark,
+                                        focusedLabelColor = SleekTextGray,
+                                        unfocusedLabelColor = SleekTextGray,
+                                        cursorColor = SleekPrimary
                                     )
                                 )
                                 Spacer(modifier = Modifier.height(12.dp))
 
-                                OutlinedTextField(
-                                    value = chatInputText,
-                                    onValueChange = { chatInputText = it },
-                                    placeholder = { Text("Paste conversation messages here...\nFormat example:\nUser: Hi there\nOther: Hello, how are you?") },
+                                // Screenshot Upload Box (Primary Workflow)
+                                Card(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .height(150.dp),
-                                    colors = OutlinedTextFieldDefaults.colors(
-                                        focusedBorderColor = SleekPrimary,
-                                        unfocusedBorderColor = SleekBorder
-                                    )
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
-
-                                // Source shortcuts
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
+                                        .clickable { galleryLauncher.launch("image/*") },
+                                    colors = CardDefaults.cardColors(containerColor = SleekBackground),
+                                    border = BorderStroke(1.dp, SleekBorder),
+                                    shape = RoundedCornerShape(8.dp)
                                 ) {
-                                    listOf("WhatsApp", "Telegram", "Discord", "Email", "Screenshot").forEach { source ->
-                                        OutlinedCard(
-                                            onClick = {
-                                                if (source == "Screenshot") {
-                                                    // Simulated OCR Autofill
-                                                    chatInputText = "Me: Hey, are we still on for dinner tonight?\nTaylor: I don't know. I'm really tired and busy. Why do you always ask last minute?\nMe: I asked yesterday afternoon too, though...\nTaylor: Whatever, forget it. Fine, let's go."
-                                                    chatTitle = "Dinner Objections"
-                                                } else {
-                                                    chatInputText = "Me: [Imported from $source]\nMe: Let's discuss our project division.\nAlex: I think I should do the presentation because you sound too nervous.\nMe: That feels unfair. I worked on 80% of the content.\nAlex: Well, if we want an A, we need someone confident speaking."
-                                                    chatTitle = "Project Division ($source)"
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 24.dp, horizontal = 16.dp),
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.AddCircle,
+                                            contentDescription = "Upload screenshots",
+                                            tint = SleekPrimary,
+                                            modifier = Modifier.size(36.dp)
+                                        )
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        Text(
+                                            text = "Upload Chat Screenshots",
+                                            style = TextXs.copy(fontWeight = FontWeight.Bold, color = SleekTextDark)
+                                        )
+                                        Spacer(modifier = Modifier.height(2.dp))
+                                        Text(
+                                            text = "Select single or multiple conversation screenshots",
+                                            style = TextXs.copy(color = SleekTextGray, fontSize = 10.sp),
+                                            textAlign = TextAlign.Center
+                                        )
+                                    }
+                                }
+
+                                // Preview selected screenshots
+                                if (selectedImageUris.isNotEmpty()) {
+                                    Spacer(modifier = Modifier.height(12.dp))
+                                    Text(
+                                        text = "SELECTED SCREENSHOTS (${selectedImageUris.size})",
+                                        style = TextXs.copy(fontWeight = FontWeight.Bold, color = SleekTextGray)
+                                    )
+                                    Spacer(modifier = Modifier.height(6.dp))
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .horizontalScroll(rememberScrollState()),
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                    ) {
+                                        selectedImageUris.forEachIndexed { index, uri ->
+                                            Box(
+                                                modifier = Modifier
+                                                    .size(80.dp)
+                                                    .clip(RoundedCornerShape(6.dp))
+                                                    .border(BorderStroke(1.dp, SleekBorder), RoundedCornerShape(6.dp))
+                                            ) {
+                                                coil.compose.AsyncImage(
+                                                    model = uri,
+                                                    contentDescription = "Screenshot $index",
+                                                    modifier = Modifier.fillMaxSize(),
+                                                    contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                                                )
+                                                IconButton(
+                                                    onClick = {
+                                                        selectedImageUris = selectedImageUris.filterIndexed { i, _ -> i != index }
+                                                    },
+                                                    modifier = Modifier
+                                                        .align(Alignment.TopEnd)
+                                                        .size(20.dp)
+                                                        .background(Color.Black.copy(alpha = 0.6f), RoundedCornerShape(100.dp))
+                                                        .padding(2.dp)
+                                                ) {
+                                                    Icon(
+                                                        imageVector = Icons.Default.Close,
+                                                        contentDescription = "Remove",
+                                                        tint = Color.White,
+                                                        modifier = Modifier.size(12.dp)
+                                                    )
                                                 }
-                                            },
-                                            modifier = Modifier.weight(1f).padding(2.dp),
-                                            shape = RoundedCornerShape(4.dp),
-                                            colors = CardDefaults.cardColors(containerColor = SleekBackground),
-                                            border = BorderStroke(1.dp, SleekBorder)
-                                        ) {
-                                            Box(modifier = Modifier.padding(vertical = 6.dp).fillMaxWidth(), contentAlignment = Alignment.Center) {
-                                                Text(source, style = TextXs.copy(fontWeight = FontWeight.Medium), maxLines = 1)
                                             }
                                         }
                                     }
                                 }
-                                
-                                Spacer(modifier = Modifier.height(16.dp))
+
+                                Spacer(modifier = Modifier.height(12.dp))
+
+                                // Expandable "Paste Chat Manually" (Secondary Option)
+                                Card(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    colors = CardDefaults.cardColors(containerColor = SleekBackground),
+                                    border = BorderStroke(1.dp, SleekBorder),
+                                    shape = RoundedCornerShape(8.dp)
+                                ) {
+                                    Column(modifier = Modifier.fillMaxWidth()) {
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .clickable { isPasteChatExpanded = !isPasteChatExpanded }
+                                                .padding(12.dp),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(
+                                                text = "Paste Chat Manually (Optional)",
+                                                style = TextXs.copy(fontWeight = FontWeight.Bold, color = SleekTextDark)
+                                            )
+                                            Icon(
+                                                imageVector = if (isPasteChatExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                                                contentDescription = "Expand",
+                                                tint = SleekPrimary,
+                                                modifier = Modifier.size(16.dp)
+                                            )
+                                        }
+                                        
+                                        if (isPasteChatExpanded) {
+                                            Column(modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 12.dp)) {
+                                                OutlinedTextField(
+                                                    value = chatInputText,
+                                                    onValueChange = { chatInputText = it },
+                                                    placeholder = { Text("Paste conversation messages here...\nFormat example:\nMe: Are we still on?\nTaylor: Sorry, I can't make it.") },
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .height(120.dp),
+                                                    colors = OutlinedTextFieldDefaults.colors(
+                                                        focusedBorderColor = SleekPrimary,
+                                                        unfocusedBorderColor = SleekBorder,
+                                                        focusedTextColor = SleekTextDark,
+                                                        unfocusedTextColor = SleekTextDark,
+                                                        focusedPlaceholderColor = SleekTextGray,
+                                                        unfocusedPlaceholderColor = SleekTextGray,
+                                                        cursorColor = SleekPrimary
+                                                    )
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.height(12.dp))
 
                                 // Privacy Controls Card
                                 Card(
@@ -448,33 +571,54 @@ fun RealChatAnalyzerScreen(
 
                                 Spacer(modifier = Modifier.height(16.dp))
 
+                                val canAnalyze = selectedImageUris.isNotEmpty() || chatInputText.isNotBlank()
+
                                 Button(
                                     onClick = {
-                                        if (chatInputText.isNotBlank()) {
+                                        if (canAnalyze && !isAnalyzing) {
                                             isAnalyzing = true
                                             coroutineScope.launch {
-                                                val source = if (chatTitle.contains("WhatsApp")) "WhatsApp" else "CopyPaste"
-                                                val title = if (chatTitle.isNotBlank()) chatTitle else "Analyzed Conversation"
-                                                viewModel.analyzeChat(
-                                                    rawText = chatInputText,
-                                                    source = source,
-                                                    anonymize = anonymizeNames,
-                                                    title = title
-                                                )
-                                                isAnalyzing = false
-                                                chatInputText = ""
-                                                chatTitle = ""
+                                                try {
+                                                    val title = if (chatTitle.isNotBlank()) chatTitle.trim() else "Analyzed Conversation"
+                                                    val source = if (selectedImageUris.isNotEmpty()) "Screenshot" else "CopyPaste"
+                                                    
+                                                    // Compress screenshots to base64 in background thread to optimize performance and prevent crashes
+                                                    val imagesBase64 = if (selectedImageUris.isNotEmpty()) {
+                                                        withContext(Dispatchers.Default) {
+                                                            selectedImageUris.mapNotNull { uri ->
+                                                                getCompressedBase64Image(context, uri)
+                                                            }
+                                                        }
+                                                    } else null
+
+                                                    viewModel.analyzeChat(
+                                                        rawText = chatInputText.trim(),
+                                                        source = source,
+                                                        anonymize = anonymizeNames,
+                                                        title = title,
+                                                        images = imagesBase64
+                                                    )
+                                                    
+                                                    chatInputText = ""
+                                                    chatTitle = ""
+                                                    selectedImageUris = emptyList()
+                                                } catch (e: Exception) {
+                                                    e.printStackTrace()
+                                                } finally {
+                                                    isAnalyzing = false
+                                                }
                                             }
                                         }
                                     },
                                     modifier = Modifier.fillMaxWidth(),
-                                    enabled = chatInputText.isNotBlank() && !isAnalyzing,
+                                    enabled = canAnalyze && !isAnalyzing,
                                     colors = ButtonDefaults.buttonColors(containerColor = SleekPrimary, contentColor = Color.White)
                                 ) {
                                     if (isAnalyzing) {
                                         CircularProgressIndicator(modifier = Modifier.size(16.dp), color = Color.White, strokeWidth = 2.dp)
                                     } else {
-                                        Text("ANALYZE CONVERSATION", style = TextSm.copy(fontWeight = FontWeight.Bold))
+                                        val btnText = if (selectedImageUris.isNotEmpty()) "ANALYZE SCREENSHOTS" else "ANALYZE PASTE CHAT"
+                                        Text(btnText, style = TextSm.copy(fontWeight = FontWeight.Bold))
                                     }
                                 }
                             }
@@ -576,5 +720,43 @@ fun RealChatAnalyzerScreen(
                 )
             }
         }
+    }
+}
+
+private fun getCompressedBase64Image(context: android.content.Context, uri: Uri): String? {
+    var inputStream: java.io.InputStream? = null
+    try {
+        inputStream = context.contentResolver.openInputStream(uri)
+        val options = BitmapFactory.Options().apply {
+            inJustDecodeBounds = true
+        }
+        BitmapFactory.decodeStream(inputStream, null, options)
+        inputStream?.close()
+
+        inputStream = context.contentResolver.openInputStream(uri)
+        val maxDimension = 1280
+        var srcWidth = options.outWidth
+        var srcHeight = options.outHeight
+        var sampleSize = 1
+        while (srcWidth > maxDimension || srcHeight > maxDimension) {
+            srcWidth /= 2
+            srcHeight /= 2
+            sampleSize *= 2
+        }
+
+        val decodeOptions = BitmapFactory.Options().apply {
+            inSampleSize = sampleSize
+        }
+        val bitmap = BitmapFactory.decodeStream(inputStream, null, decodeOptions) ?: return null
+        val outputStream = java.io.ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream)
+        val byteArray = outputStream.toByteArray()
+        bitmap.recycle()
+        return Base64.encodeToString(byteArray, Base64.NO_WRAP)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        return null
+    } finally {
+        inputStream?.close()
     }
 }

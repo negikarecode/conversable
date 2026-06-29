@@ -26,22 +26,23 @@ val WarningLight = Color(0xFFFFF9E6)   // Minimal Warning Light
 val Danger = Color(0xFFD64545)         // Soft Error Red
 val DangerLight = Color(0xFFFDF2F2)    // Minimal Error Light
 
-// Map existing variables for compatibility
-val SleekBackground = BgApp
-val SleekSurface = BgCard
-val SleekPrimary = Accent
-val SleekPrimaryLight = AccentLight
-val SleekTextDark = TextPrimary
-val SleekTextGray = TextSecondary
-val SleekTextLightGray = TextMuted
-val SleekBorder = Border
-val SleekBubblePartner = BgCard
-val SleekBubblePartnerText = TextPrimary
-val SleekBubbleUser = Accent
-val SleekBubbleUserText = TextOnDark
-val SleekWarning = Danger
-val SleekSuccess = Success
-val SleekWarningAmber = Warning
+// Map existing variables for compatibility (made mutable to support light/dark theme toggle dynamically)
+var SleekBackground = BgApp
+var SleekSurface = BgCard
+var SleekPrimary = Accent
+var SleekPrimaryLight = AccentLight
+var SleekTextDark = TextPrimary
+var SleekTextGray = TextSecondary
+var SleekTextLightGray = TextMuted
+var SleekBorder = Border
+var SleekBubblePartner = BgCard
+var SleekBubblePartnerText = TextPrimary
+var SleekBubbleUser = Accent
+var SleekBubbleUserText = TextOnDark
+var SleekWarning = Danger
+var SleekSuccess = Success
+var SleekWarningAmber = Warning
+
 
 
 

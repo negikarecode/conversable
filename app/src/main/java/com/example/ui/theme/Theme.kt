@@ -57,6 +57,35 @@ fun MyApplicationTheme(
   dynamicColor: Boolean = false,
   content: @Composable () -> Unit,
 ) {
+  // Update the global variables dynamically based on the current theme
+  if (darkTheme) {
+    SleekBackground = androidx.compose.ui.graphics.Color(0xFF1A1A2E)
+    SleekSurface = androidx.compose.ui.graphics.Color(0xFF252538)
+    SleekPrimary = androidx.compose.ui.graphics.Color.White
+    SleekPrimaryLight = androidx.compose.ui.graphics.Color(0xFF32324D)
+    SleekTextDark = androidx.compose.ui.graphics.Color.White
+    SleekTextGray = androidx.compose.ui.graphics.Color(0xFFCCCCCC)
+    SleekTextLightGray = androidx.compose.ui.graphics.Color(0xFF999999)
+    SleekBorder = androidx.compose.ui.graphics.Color(0xFF3F3F5A)
+    SleekBubblePartner = androidx.compose.ui.graphics.Color(0xFF2D2D44)
+    SleekBubblePartnerText = androidx.compose.ui.graphics.Color.White
+    SleekBubbleUser = androidx.compose.ui.graphics.Color.White
+    SleekBubbleUserText = androidx.compose.ui.graphics.Color(0xFF1A1A2E)
+  } else {
+    SleekBackground = BgApp
+    SleekSurface = BgCard
+    SleekPrimary = Accent
+    SleekPrimaryLight = AccentLight
+    SleekTextDark = TextPrimary
+    SleekTextGray = TextSecondary
+    SleekTextLightGray = TextMuted
+    SleekBorder = Border
+    SleekBubblePartner = BgCard
+    SleekBubblePartnerText = TextPrimary
+    SleekBubbleUser = Accent
+    SleekBubbleUserText = TextOnDark
+  }
+
   val colorScheme =
     when {
       dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
@@ -68,7 +97,16 @@ fun MyApplicationTheme(
       else -> LightColorScheme
     }
 
-  MaterialTheme(colorScheme = colorScheme, typography = Typography, content = content)
+  val textSelectionColors = androidx.compose.foundation.text.selection.TextSelectionColors(
+      handleColor = SleekPrimary,
+      backgroundColor = SleekPrimaryLight.copy(alpha = 0.4f)
+  )
+
+  androidx.compose.runtime.CompositionLocalProvider(
+      androidx.compose.foundation.text.selection.LocalTextSelectionColors provides textSelectionColors
+  ) {
+      MaterialTheme(colorScheme = colorScheme, typography = Typography, content = content)
+  }
 }
 
 fun Modifier.bounceClick() = composed {

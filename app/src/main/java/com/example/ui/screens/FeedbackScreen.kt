@@ -102,8 +102,8 @@ fun FeedbackScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(16.dp))
-                    .background(Color.White)
-                    .border(BorderStroke(1.dp, Color(0xFFE5E5EA)), RoundedCornerShape(16.dp))
+                    .background(SleekSurface)
+                    .border(BorderStroke(1.dp, SleekBorder), RoundedCornerShape(16.dp))
                     .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {

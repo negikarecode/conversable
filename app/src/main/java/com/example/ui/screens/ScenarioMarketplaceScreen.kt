@@ -192,18 +192,23 @@ fun ScenarioMarketplaceScreen(
                                 modifier = Modifier.fillMaxWidth().height(80.dp),
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedBorderColor = SleekPrimary,
-                                    unfocusedBorderColor = SleekBorder
+                                    unfocusedBorderColor = SleekBorder,
+                                    focusedTextColor = SleekTextDark,
+                                    unfocusedTextColor = SleekTextDark,
+                                    focusedPlaceholderColor = SleekTextGray,
+                                    unfocusedPlaceholderColor = SleekTextGray,
+                                    cursorColor = SleekPrimary
                                 )
                             )
                             Spacer(modifier = Modifier.height(12.dp))
                             Button(
                                 onClick = {
-                                    if (aiGeneratorInput.isNotBlank()) {
+                                    val trimmed = aiGeneratorInput.trim()
+                                    if (trimmed.isNotBlank()) {
                                         isGeneratingScenario = true
                                         coroutineScope.launch {
-                                            viewModel.generateScenarioWithAi(aiGeneratorInput) { created ->
+                                            viewModel.generateScenarioWithAi(trimmed) { created ->
                                                 if (created != null) {
-                                                    // Map Entity back to model Scenario
                                                      val modelScenario = Scenario(
                                                          id = created.id,
                                                          title = created.title,
@@ -230,7 +235,13 @@ fun ScenarioMarketplaceScreen(
                                 colors = ButtonDefaults.buttonColors(containerColor = SleekPrimary, contentColor = Color.White)
                             ) {
                                 if (isGeneratingScenario) {
-                                    CircularProgressIndicator(modifier = Modifier.size(16.dp), color = Color.White, strokeWidth = 2.dp)
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                    ) {
+                                        CircularProgressIndicator(modifier = Modifier.size(16.dp), color = Color.White, strokeWidth = 2.dp)
+                                        Text("Creating your personalized scenario...", style = TextXs.copy(color = Color.White, fontWeight = FontWeight.Bold))
+                                    }
                                 } else {
                                     Text("GENERATE SCENARIO", style = TextSm.copy(fontWeight = FontWeight.Bold))
                                 }

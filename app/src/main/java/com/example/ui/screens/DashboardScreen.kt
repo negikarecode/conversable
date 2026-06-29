@@ -155,18 +155,6 @@ fun DashboardScreen(
         }
     }
 
-    // Auto-close bottom sheet on success scenario generation
-    LaunchedEffect(allScenariosFlow) {
-        if (showCustomScenarioSheet && !isGeneratingScenario && customScenarioInput.isNotEmpty()) {
-            // Find newly generated scenario
-            val newlyCreated = allScenariosFlow.firstOrNull { it.id.startsWith("custom_") }
-            if (newlyCreated != null) {
-                showCustomScenarioSheet = false
-                customScenarioInput = ""
-            }
-        }
-    }
-
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -518,6 +506,11 @@ fun DashboardScreen(
                         
                         Spacer(modifier = Modifier.height(16.dp))
                         
+                        com.example.ui.components.AiErrorBanner(
+                            viewModel = viewModel,
+                            modifier = Modifier.padding(bottom = 12.dp)
+                        )
+
                         Text(
                             text = "Describe any specific social situation, job interview, or difficult conversation you want to practice. Our AI coach will prepare it instantly.",
                             style = TextSm.copy(color = TextSecondary, lineHeight = 20.sp)
@@ -547,7 +540,12 @@ fun DashboardScreen(
                                 disabledBorderColor = Border,
                                 focusedContainerColor = BgInput,
                                 unfocusedContainerColor = BgInput,
-                                disabledContainerColor = BgInput
+                                disabledContainerColor = BgInput,
+                                focusedTextColor = Color.Black,
+                                unfocusedTextColor = Color.Black,
+                                focusedPlaceholderColor = Color.DarkGray,
+                                unfocusedPlaceholderColor = Color.DarkGray,
+                                cursorColor = Color.Black
                             )
                         )
                         
@@ -555,14 +553,17 @@ fun DashboardScreen(
                         
                         Button(
                             onClick = {
-                                if (customScenarioInput.isNotBlank()) {
+                                val trimmedInput = customScenarioInput.trim()
+                                if (trimmedInput.isNotBlank()) {
                                     viewModel.generateScenario(
-                                        userInput = customScenarioInput,
-                                        onSuccess = { _ -> 
-                                            // Managed via LaunchedEffect / flow update
+                                        userInput = trimmedInput,
+                                        onSuccess = { generatedScenario ->
+                                            showCustomScenarioSheet = false
+                                            customScenarioInput = ""
+                                            onStartScenario(generatedScenario)
                                         },
                                         onError = { _ ->
-                                            // Handled internally or silently dismissed
+                                            // Managed via viewModel's aiError state flow which triggers the AiErrorBanner
                                         }
                                     )
                                 }
@@ -581,11 +582,20 @@ fun DashboardScreen(
                             )
                         ) {
                             if (isGeneratingScenario) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(20.dp),
-                                    color = TextOnDark,
-                                    strokeWidth = 2.dp
-                                )
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(20.dp),
+                                        color = TextOnDark,
+                                        strokeWidth = 2.dp
+                                    )
+                                    Text(
+                                        text = "Creating your personalized scenario...",
+                                        style = TextSm.copy(color = TextOnDark)
+                                    )
+                                }
                             } else {
                                 Text("Generate practice scenario", style = TextSm.copy(fontWeight = FontWeight.Medium))
                             }

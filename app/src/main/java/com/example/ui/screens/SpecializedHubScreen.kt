@@ -326,16 +326,22 @@ fun SpecializedHubScreen(
                                 modifier = Modifier.fillMaxWidth().height(70.dp),
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedBorderColor = SleekPrimary,
-                                    unfocusedBorderColor = SleekBorder
+                                    unfocusedBorderColor = SleekBorder,
+                                    focusedTextColor = SleekTextDark,
+                                    unfocusedTextColor = SleekTextDark,
+                                    focusedPlaceholderColor = SleekTextGray,
+                                    unfocusedPlaceholderColor = SleekTextGray,
+                                    cursorColor = SleekPrimary
                                 )
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Button(
                                 onClick = {
-                                    if (customPrompt.isNotBlank()) {
+                                    val trimmed = customPrompt.trim()
+                                    if (trimmed.isNotBlank()) {
                                         isGeneratingCustom = true
                                         coroutineScope.launch {
-                                            viewModel.generateScenarioWithAi("$hubType - $customPrompt") { created ->
+                                            viewModel.generateScenarioWithAi("$hubType - $trimmed") { created ->
                                                 if (created != null) {
                                                      val modelScenario = Scenario(
                                                          id = created.id,
@@ -363,7 +369,13 @@ fun SpecializedHubScreen(
                                 colors = ButtonDefaults.buttonColors(containerColor = SleekPrimary, contentColor = Color.White)
                             ) {
                                 if (isGeneratingCustom) {
-                                    CircularProgressIndicator(modifier = Modifier.size(16.dp), color = Color.White, strokeWidth = 2.dp)
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                    ) {
+                                        CircularProgressIndicator(modifier = Modifier.size(16.dp), color = Color.White, strokeWidth = 2.dp)
+                                        Text("Creating your personalized scenario...", style = TextXs.copy(color = Color.White, fontWeight = FontWeight.Bold))
+                                    }
                                 } else {
                                     Text("GENERATE CUSTOM SCENARIO", style = TextSm.copy(fontWeight = FontWeight.Bold))
                                 }

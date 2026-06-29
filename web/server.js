@@ -20,23 +20,44 @@ const PROVIDERS = {
     parseResponse: (data) => {
       return data.candidates?.[0]?.content?.parts?.[0]?.text;
     },
-    formatPayload: (systemPrompt, messages, temperature, maxTokens) => {
+    formatPayload: (systemPrompt, messages, temperature, maxTokens, forceJson, images) => {
       const contents = [];
       if (systemPrompt) {
         contents.push({ role: 'user', parts: [{ text: `System instruction: ${systemPrompt}` }] });
       }
+      
+      const userParts = [];
       messages.forEach(msg => {
-        contents.push({
-          role: msg.role === 'assistant' ? 'model' : 'user',
-          parts: [{ text: msg.content }]
-        });
+        userParts.push({ text: msg.content });
       });
+      
+      if (images && images.length > 0) {
+        images.forEach(img => {
+          userParts.push({
+            inlineData: {
+              mimeType: img.mimeType || 'image/jpeg',
+              data: img.data
+            }
+          });
+        });
+      }
+      
+      contents.push({
+        role: 'user',
+        parts: userParts
+      });
+      
+      const config = {
+        temperature: temperature || 0.7,
+        maxOutputTokens: maxTokens || 150
+      };
+      if (forceJson) {
+        config.responseMimeType = 'application/json';
+      }
+      
       return {
         contents,
-        generationConfig: {
-          temperature: temperature || 0.7,
-          maxOutputTokens: maxTokens || 150
-        }
+        generationConfig: config
       };
     }
   },
@@ -415,8 +436,8 @@ setInterval(async () => {
 }, 60 * 1000); // 1 min
 
 // Intelligent routing & failover
-async function routeChatRequest(systemPrompt, messages, temperature, maxTokens, forceJson) {
-  const orderedProviders = Object.keys(PROVIDERS)
+async function routeChatRequest(systemPrompt, messages, temperature, maxTokens, forceJson, images) {
+  let orderedProviders = Object.keys(PROVIDERS)
     .filter(key => healthStates[key].status === 'Healthy' || healthStates[key].status === 'Degraded')
     .sort((a, b) => {
       if (healthStates[a].status !== healthStates[b].status) {
@@ -426,6 +447,14 @@ async function routeChatRequest(systemPrompt, messages, temperature, maxTokens, 
       const latB = healthStates[b].avgLatency || 9999;
       return latA - latB;
     });
+
+  // If there are images, we MUST use a vision-capable provider (Google Gemini)
+  if (images && images.length > 0) {
+    orderedProviders = ['gemini'].filter(key => healthStates[key].status === 'Healthy' || healthStates[key].status === 'Degraded');
+    if (orderedProviders.length === 0) {
+      orderedProviders = ['gemini']; // Force try gemini if it is the only vision provider
+    }
+  }
 
   if (orderedProviders.length === 0) {
     throw new Error('All configured AI providers are currently unavailable.');
@@ -459,7 +488,7 @@ async function routeChatRequest(systemPrompt, messages, temperature, maxTokens, 
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 6000); // 6s request timeout for fast failover
 
-      const payload = config.formatPayload(systemPrompt, messages, temperature, maxTokens, forceJson);
+      const payload = config.formatPayload(systemPrompt, messages, temperature, maxTokens, forceJson, images);
 
       const response = await fetch(url, {
         method: 'POST',
@@ -1095,6 +1124,7 @@ app.post('/api/chat', async (c) => {
     const temperature = body.temperature;
     const maxTokens = body.max_tokens;
     const forceJson = body.response_format?.type === 'json_object';
+    const images = body.images; // Extract images from request body
     
     // Separate system prompt from messages if it exists
     let systemPrompt = null;
@@ -1107,7 +1137,7 @@ app.post('/api/chat', async (c) => {
       }
     });
 
-    const result = await routeChatRequest(systemPrompt, cleanMessages, temperature, maxTokens, forceJson);
+    const result = await routeChatRequest(systemPrompt, cleanMessages, temperature, maxTokens, forceJson, images);
     
     // Return standard OpenAI format response
     return c.json({
